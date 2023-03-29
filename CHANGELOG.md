@@ -1,9 +1,12 @@
+# 0.1.0
+* Update license
+
 # 0.0.9
 * Enable slide to select text in card
 * Fix some bugs
 
 # 0.0.8
-* Enable drag and drop group  
+* Enable drag and drop group
 
 # 0.0.7
 * Rename some classes
@@ -15,7 +18,7 @@
 
 # 0.0.5
 * Optimize insert card animation
-* Enable insert card at the end of the group 
+* Enable insert card at the end of the group
 * Fix some bugs
 
 # 0.0.4

@@ -16,8 +16,8 @@
 
 ## Intro
 
-appflowy_board is a customizable and draggable Kanban Board widget for Flutter. 
-You can use it to create a Kanban Board tool like those in Trello. 
+appflowy_board is a customizable and draggable Kanban Board widget for Flutter.
+You can use it to create a Kanban Board tool like those in Trello.
 
 Check out [appflowy_board](https://github.com/AppFlowy-IO/appflowy-board) to see to build a BoardView database.
 
@@ -38,7 +38,7 @@ flutter pub get
 This will add a line like this to your package's pubspec.yaml:
 ```dart
 dependencies:
-  appflowy_board: ^0.0.6
+  appflowy_board: ^0.1.0
 ```
 
 ## Create your first board
@@ -109,7 +109,7 @@ Widget build(BuildContext context) {
       );
     },
     groupConstraints: const BoxConstraints.tightFor(width: 240),
-  ); 
+  );
 }
 
 ```
@@ -120,7 +120,7 @@ First, run main.dart to play with the demo.
 
 
 Second, let's delve into multi_board_list_example.dart to understand a few key components:
-* A Board widget is created via instantiating an `AppFlowyBoard` object. 
+* A Board widget is created via instantiating an `AppFlowyBoard` object.
 * In the `AppFlowyBoard` object, you can find the `AppFlowyBoardController`, which is defined in board_data.dart, is fed with pre-populated mock data. It also contains callback functions to materialize future user data.
 * Three builders: AppFlowyBoardHeaderBuilder, AppFlowyBoardFooterBuilder, AppFlowyBoardCardBuilder. See below image for what they are used for.
 
