@@ -600,6 +600,7 @@ class ReorderFlexState extends State<ReorderFlex>
     } else {
       return Scrollbar(
         controller: _scrollController,
+        thumbVisibility: true,
         child: SingleChildScrollView(
           scrollDirection: widget.config.direction,
           controller: _scrollController,
