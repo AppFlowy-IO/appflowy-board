@@ -598,10 +598,13 @@ class ReorderFlexState extends State<ReorderFlex>
         PrimaryScrollController.of(context) == null) {
       return child;
     } else {
-      return SingleChildScrollView(
-        scrollDirection: widget.config.direction,
+      return Scrollbar(
         controller: _scrollController,
-        child: child,
+        child: SingleChildScrollView(
+          scrollDirection: widget.config.direction,
+          controller: _scrollController,
+          child: child,
+        ),
       );
     }
   }
