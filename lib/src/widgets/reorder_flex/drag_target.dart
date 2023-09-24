@@ -165,7 +165,7 @@ class _ReorderDragTargetState<T extends DragTargetData>
           widget.insertAnimationController,
           widget.deleteAnimationController,
         ) ??
-        Draggable<DragTargetData>(
+        LongPressDraggable<DragTargetData>(
           axis: widget.dragDirection,
           maxSimultaneousDrags: widget.draggable ? 1 : 0,
           data: widget.dragTargetData,
@@ -198,6 +198,7 @@ class _ReorderDragTargetState<T extends DragTargetData>
           onDraggableCanceled: (Velocity velocity, Offset offset) {
             widget.onDragEnded(widget.dragTargetData);
           },
+          delay: const Duration(milliseconds: 200),
           child: widget.child,
         );
 
