@@ -53,6 +53,8 @@ class ReorderDragTarget<T extends DragTargetData> extends StatefulWidget {
 
   final DragTargetOnEnded<T> onDragEnded;
 
+  final Function(Offset offset) onDragGlobalPositionUpdate;
+
   final DragTargetOnMove<T> onDragMoved;
 
   /// Called to determine whether this widget is interested in receiving a given
@@ -93,6 +95,7 @@ class ReorderDragTarget<T extends DragTargetData> extends StatefulWidget {
     required this.onDragStarted,
     required this.onDragMoved,
     required this.onDragEnded,
+    required this.onDragGlobalPositionUpdate,
     required this.onWillAccept,
     required this.insertAnimationController,
     required this.deleteAnimationController,
@@ -184,6 +187,14 @@ class _ReorderDragTargetState<T extends DragTargetData>
               _draggingFeedbackSize,
             );
           },
+          onDragUpdate: ((details) {
+            widget.onDragGlobalPositionUpdate(details.globalPosition);
+            // print({
+            //   "delta" : details.delta,
+            //   "primaryData": details.primaryDelta,
+            //   "globalPosition" :details.globalPosition
+            // });
+          }),
           dragAnchorStrategy: childDragAnchorStrategy,
 
           /// When the drag ends inside a DragTarget widget, the drag
@@ -317,6 +328,7 @@ class AbsorbPointerWidget extends StatelessWidget {
   final Widget? child;
   final bool useIntrinsicSize;
   final double opacity;
+
   const AbsorbPointerWidget({
     required this.child,
     required this.opacity,
@@ -342,6 +354,7 @@ class AbsorbPointerWidget extends StatelessWidget {
 class PhantomWidget extends StatelessWidget {
   final Widget? child;
   final double opacity;
+
   const PhantomWidget({
     this.child,
     this.opacity = 1.0,
@@ -435,12 +448,15 @@ class _DragTargeMovePlaceholderState extends State<DragTargeMovePlaceholder> {
 
 abstract class FakeDragTargetEventTrigger {
   void fakeOnDragStart(void Function(int?) callback);
+
   void fakeOnDragEnded(VoidCallback callback);
 }
 
 abstract class FakeDragTargetEventData {
   Size? get feedbackSize;
+
   int get index;
+
   DragTargetData get dragTargetData;
 }
 
@@ -453,6 +469,7 @@ class FakeDragTarget<T extends DragTargetData> extends StatefulWidget {
   final Widget child;
   final AnimationController insertAnimationController;
   final AnimationController deleteAnimationController;
+
   const FakeDragTarget({
     Key? key,
     required this.eventTrigger,

@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:ffi';
+
 import 'package:appflowy_board/src/utils/log.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -144,6 +147,18 @@ class AppFlowyBoard extends StatelessWidget {
   }
 }
 
+enum DragAndScrollState {
+  idle(speed: 0),
+  moveLeft(speed: -50),
+  moveRight(speed: 50);
+
+  final int speed;
+
+  const DragAndScrollState({
+    required this.speed,
+  });
+}
+
 class _AppFlowyBoardContent extends StatefulWidget {
   final ScrollController? scrollController;
   final OnReorder onReorder;
@@ -190,6 +205,9 @@ class _AppFlowyBoardContentState extends State<_AppFlowyBoardContent> {
       GlobalKey(debugLabel: '$_AppFlowyBoardContent overlay key');
   late BoardOverlayEntry _overlayEntry;
 
+  DragAndScrollState _dragAndScrollState = DragAndScrollState.idle;
+  Timer? _dragAndScrollTime;
+
   @override
   void initState() {
     _overlayEntry = BoardOverlayEntry(
@@ -205,6 +223,10 @@ class _AppFlowyBoardContentState extends State<_AppFlowyBoardContent> {
           config: widget.reorderFlexConfig,
           scrollController: widget.scrollController,
           onReorder: widget.onReorder,
+          onDragGlobalPositionUpdate: ((offset) {
+            // this will be called if move the whole group
+            // print("from board.dart 209: $offset");
+          }),
           dataSource: widget.dataController,
           interceptor: interceptor,
           children: _buildColumns(),
@@ -277,6 +299,38 @@ class _AppFlowyBoardContentState extends State<_AppFlowyBoardContent> {
                 dragTargetKeys: widget.boardState,
                 reorderFlexAction: reorderFlexAction,
                 stretchGroupHeight: widget.config.stretchGroupHeight,
+                onDragEnded: ((_) {
+                  _dragAndScrollState = DragAndScrollState.idle;
+                  _dragAndScrollTime?.cancel();
+                  _dragAndScrollTime = null;
+                }),
+                onDragMoveInGlobalPosition: ((offset) {
+                  DragAndScrollState newState = DragAndScrollState.idle;
+                  final width = MediaQuery.of(context).size.width;
+                  if (offset.dx < 80) {
+                    newState = DragAndScrollState.moveLeft;
+                  } else if (width - offset.dx <= 80) {
+                    newState = DragAndScrollState.moveRight;
+                  } else {
+                    newState = DragAndScrollState.idle;
+                  }
+                  if (newState != _dragAndScrollState) {
+                    _dragAndScrollState = newState;
+                    _dragAndScrollTime?.cancel();
+                    if (newState == DragAndScrollState.idle) {
+                      _dragAndScrollTime = null;
+                      return;
+                    }
+                    _dragAndScrollTime = Timer.periodic(
+                        const Duration(milliseconds: 200), (timer) {
+                      widget.scrollController?.animateTo(
+                        widget.scrollController!.offset + newState.speed,
+                        duration: const Duration(milliseconds: 200),
+                        curve: Curves.linear,
+                      );
+                    });
+                  }
+                }),
               );
 
               return ConstrainedBox(

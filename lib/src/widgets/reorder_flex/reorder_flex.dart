@@ -12,6 +12,7 @@ import 'drag_target_interceptor.dart';
 
 typedef OnDragStarted = void Function(int index);
 typedef OnDragEnded = void Function();
+typedef OnDragMove = void Function(Offset offset);
 typedef OnReorder = void Function(int fromIndex, int toIndex);
 typedef OnDeleted = void Function(int deletedIndex);
 typedef OnInserted = void Function(int insertedIndex);
@@ -102,6 +103,9 @@ class ReorderFlex extends StatefulWidget {
   /// [onReorder] is called when dragTarget did end dragging
   final OnReorder onReorder;
 
+  /// [onDragGlobalPositionUpdate] is called when drag happening in the global coordinates
+  final OnDragMove? onDragGlobalPositionUpdate;
+
   /// [onDragEnded] is called when dragTarget did end dragging
   final OnDragEnded? onDragEnded;
 
@@ -126,6 +130,7 @@ class ReorderFlex extends StatefulWidget {
     this.dragStateStorage,
     this.dragTargetKeys,
     this.onDragStarted,
+    this.onDragGlobalPositionUpdate,
     this.onDragEnded,
     this.interceptor,
     this.reorderFlexAction,
@@ -429,6 +434,9 @@ class ReorderFlexState extends State<ReorderFlex>
       onDragMoved: (dragTargetData, offset) {
         dragTargetData.dragTargetOffset = offset;
       },
+      onDragGlobalPositionUpdate: ((offset){
+        widget.onDragGlobalPositionUpdate?.call(offset);
+      }),
       onDragEnded: (dragTargetData) {
         if (!mounted) {
           Log.warn(
