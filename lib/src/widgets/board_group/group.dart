@@ -14,30 +14,30 @@ typedef OnGroupDragStarted = void Function(int index);
 typedef OnGroupDragEnded = void Function(String groupId);
 
 typedef OnGroupReorder = void Function(
-  String groupId,
-  int fromIndex,
-  int toIndex,
-);
+    String groupId,
+    int fromIndex,
+    int toIndex,
+    );
 
 typedef OnGroupDeleted = void Function(String groupId, int deletedIndex);
 
 typedef OnGroupInserted = void Function(String groupId, int insertedIndex);
 
 typedef AppFlowyBoardCardBuilder = Widget Function(
-  BuildContext context,
-  AppFlowyGroupData groupData,
-  AppFlowyGroupItem item,
-);
+    BuildContext context,
+    AppFlowyGroupData groupData,
+    AppFlowyGroupItem item,
+    );
 
 typedef AppFlowyBoardHeaderBuilder = Widget? Function(
-  BuildContext context,
-  AppFlowyGroupData groupData,
-);
+    BuildContext context,
+    AppFlowyGroupData groupData,
+    );
 
 typedef AppFlowyBoardFooterBuilder = Widget Function(
-  BuildContext context,
-  AppFlowyGroupData groupData,
-);
+    BuildContext context,
+    AppFlowyGroupData groupData,
+    );
 
 abstract class AppFlowyGroupDataDataSource extends ReoderFlexDataSource {
   AppFlowyGroupData get groupData;
@@ -96,6 +96,8 @@ class AppFlowyBoardGroup extends StatefulWidget {
 
   final ReorderFlexAction? reorderFlexAction;
 
+  final OnDragMove? onDragMoveInGlobalPosition;
+
   const AppFlowyBoardGroup({
     Key? key,
     this.headerBuilder,
@@ -115,7 +117,9 @@ class AppFlowyBoardGroup extends StatefulWidget {
     this.cornerRadius = 0.0,
     this.backgroundColor = Colors.transparent,
     this.stretchGroupHeight = true,
-  })  : config = const ReorderFlexConfig(),
+    this.onDragMoveInGlobalPosition,
+  })
+      : config = const ReorderFlexConfig(),
         super(key: key);
 
   @override
@@ -124,7 +128,7 @@ class AppFlowyBoardGroup extends StatefulWidget {
 
 class _AppFlowyBoardGroupState extends State<AppFlowyBoardGroup> {
   final GlobalKey _columnOverlayKey =
-      GlobalKey(debugLabel: '$AppFlowyBoardGroup overlay key');
+  GlobalKey(debugLabel: '$AppFlowyBoardGroup overlay key');
   late BoardOverlayEntry _overlayEntry;
 
   @override
@@ -136,10 +140,10 @@ class _AppFlowyBoardGroupState extends State<AppFlowyBoardGroup> {
             .toList();
 
         final header =
-            widget.headerBuilder?.call(context, widget.dataSource.groupData);
+        widget.headerBuilder?.call(context, widget.dataSource.groupData);
 
         final footer =
-            widget.footerBuilder?.call(context, widget.dataSource.groupData);
+        widget.footerBuilder?.call(context, widget.dataSource.groupData);
 
         final interceptor = CrossReorderFlexDragTargetInterceptor(
           reorderFlexId: widget.groupId,
@@ -158,6 +162,9 @@ class _AppFlowyBoardGroupState extends State<AppFlowyBoardGroup> {
             widget.phantomController.groupStartDragging(widget.groupId);
             widget.onDragStarted?.call(index);
           },
+          onDragGlobalPositionUpdate: ((offset) {
+            widget.onDragMoveInGlobalPosition?.call(offset);
+          }),
           onReorder: ((fromIndex, toIndex) {
             if (widget.phantomController.shouldReorder(widget.groupId)) {
               widget.onReorder(widget.groupId, fromIndex, toIndex);

@@ -22,6 +22,7 @@ class _MultiBoardListExampleState extends State<MultiBoardListExample> {
   );
 
   late AppFlowyBoardScrollController boardController;
+  final _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -65,6 +66,7 @@ class _MultiBoardListExampleState extends State<MultiBoardListExample> {
     );
     return AppFlowyBoard(
         controller: controller,
+        scrollController: _scrollController,
         cardBuilder: (context, group, groupItem) {
           return AppFlowyGroupCard(
             key: ValueKey(groupItem.id),
