@@ -116,8 +116,12 @@ class ReorderFlex extends StatefulWidget {
 
   final ReorderFlexAction? reorderFlexAction;
 
+  final Widget? leading;
+
+  final Widget? trailing;
+
   ReorderFlex({
-    Key? key,
+    super.key,
     this.scrollController,
     required this.dataSource,
     required this.children,
@@ -129,9 +133,10 @@ class ReorderFlex extends StatefulWidget {
     this.onDragEnded,
     this.interceptor,
     this.reorderFlexAction,
-  })  : assert(children.every((Widget w) => w.key != null),
-            'All child must have a key.'),
-        super(key: key);
+    this.leading,
+    this.trailing,
+  }) : assert(children.every((Widget w) => w.key != null),
+            'All child must have a key.');
 
   @override
   State<ReorderFlex> createState() => ReorderFlexState();
@@ -230,13 +235,6 @@ class ReorderFlexState extends State<ReorderFlex>
       );
 
       children.add(_wrap(child, i, indexKey, item.draggable));
-
-      // if (widget.config.useMovePlaceholder) {
-      //   children.add(DragTargeMovePlaceholder(
-      //     dragTargetIndex: i,
-      //     delegate: _notifier,
-      //   ));
-      // }
     }
 
     final child = _wrapContainer(children);
@@ -616,14 +614,22 @@ class ReorderFlexState extends State<ReorderFlex>
         return Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: widget.mainAxisAlignment,
-          children: children,
+          children: [
+            if (widget.leading != null) widget.leading!,
+            ...children,
+            if (widget.trailing != null) widget.trailing!
+          ],
         );
       case Axis.vertical:
       default:
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: widget.mainAxisAlignment,
-          children: children,
+          children: [
+            if (widget.leading != null) widget.leading!,
+            ...children,
+            if (widget.trailing != null) widget.trailing!
+          ],
         );
     }
   }
