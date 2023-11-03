@@ -203,11 +203,11 @@ class ReorderFlexState extends State<ReorderFlex>
     }
 
     _scrollController = widget.scrollController ??
-        PrimaryScrollController.of(context) ??
+        PrimaryScrollController.maybeOf(context) ??
         ScrollController();
 
     if (_scrollController.hasClients) {
-      _attachedScrollPosition = Scrollable.of(context)?.position;
+      _attachedScrollPosition = Scrollable.maybeOf(context)?.position;
     } else {
       _attachedScrollPosition = null;
     }
@@ -593,7 +593,7 @@ class ReorderFlexState extends State<ReorderFlex>
 
   Widget _wrapScrollView({required Widget child}) {
     if (widget.scrollController != null &&
-        PrimaryScrollController.of(context) == null) {
+        PrimaryScrollController.maybeOf(context) == null) {
       return child;
     } else {
       return Scrollbar(
@@ -701,7 +701,7 @@ class ReorderFlexState extends State<ReorderFlex>
     if (_scrolling) return;
     final RenderObject contextObject = context.findRenderObject()!;
     final RenderAbstractViewport viewport =
-        RenderAbstractViewport.of(contextObject)!;
+        RenderAbstractViewport.of(contextObject);
     // If and only if the current scroll offset falls in-between the offsets
     // necessary to reveal the selected context at the top or bottom of the
     // screen, then it is already on-screen.
