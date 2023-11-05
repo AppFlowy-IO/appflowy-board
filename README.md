@@ -9,9 +9,8 @@
     <a href="https://twitter.com/appflowy"><b>Twitter</b></a>
 </p>
 
-
 <p align="center">
-<img src="https://github.com/AppFlowy-IO/appflowy-board/tree/main/example/gifs/appflowy_board_video_1.gif?raw=true" width="680" title="AppFlowyBoard">
+<img src="https://github.com/AppFlowy-IO/appflowy-board/blob/main/example/gifs/appflowy_board_video_1.gif?raw=true" width="680" title="AppFlowyBoard">
 </p>
 
 ## Intro
@@ -22,20 +21,22 @@ You can use it to create a Kanban Board tool like those in Trello.
 Check out [appflowy_board](https://github.com/AppFlowy-IO/appflowy-board) to see to build a BoardView database.
 
 <p align="center">
-<img src="https://github.com/AppFlowy-IO/appflowy-board/tree/main/example/gifs/appflowy_board_video_2.gif?raw=true" width="680" title="AppFlowyBoard">
+<img src="https://github.com/AppFlowy-IO/appflowy-board/blob/main/example/gifs/appflowy_board_video_2.gif?raw=true" width="680" title="AppFlowyBoard">
 </p>
 
-
 ## Getting Started
+
 Add the AppFlowy Board [Flutter package](https://docs.flutter.dev/development/packages-and-plugins/using-packages) to your environment.
 
 With Flutter:
+
 ```dart
 flutter pub add appflowy_board
 flutter pub get
 ```
 
 This will add a line like this to your package's pubspec.yaml:
+
 ```dart
 dependencies:
   appflowy_board: ^0.1.0
@@ -115,25 +116,26 @@ Widget build(BuildContext context) {
 ```
 
 ## Usage Example
+
 To quickly grasp how it can be used, look at the /example/lib folder.
 First, run main.dart to play with the demo.
 
-
 Second, let's delve into multi_board_list_example.dart to understand a few key components:
-* A Board widget is created via instantiating an `AppFlowyBoard` object.
-* In the `AppFlowyBoard` object, you can find the `AppFlowyBoardController`, which is defined in board_data.dart, is fed with pre-populated mock data. It also contains callback functions to materialize future user data.
-* Three builders: AppFlowyBoardHeaderBuilder, AppFlowyBoardFooterBuilder, AppFlowyBoardCardBuilder. See below image for what they are used for.
 
+- A Board widget is created via instantiating an `AppFlowyBoard` object.
+- In the `AppFlowyBoard` object, you can find the `AppFlowyBoardController`, which is defined in board_data.dart, is fed with pre-populated mock data. It also contains callback functions to materialize future user data.
+- Three builders: AppFlowyBoardHeaderBuilder, AppFlowyBoardFooterBuilder, AppFlowyBoardCardBuilder. See below image for what they are used for.
 
 <p>
-<img src="https://github.com/AppFlowy-IO/appflowy-board/tree/main/example/gifs/appflowy_board_builders.jpg?raw=true" width="200" title="AppFlowyBoard">
+<img src="https://github.com/AppFlowy-IO/appflowy-board/blob/main/example/gifs/appflowy_board_builders.jpg?raw=true" width="200" title="AppFlowyBoard">
 </p>
 
 ## Glossary
+
 Please refer to the API documentation.
 
 ## Contributing
+
 Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are greatly appreciated.
 
 Please look at [CONTRIBUTING.md](https://appflowy.gitbook.io/docs/essential-documentation/contribute-to-appflowy/contributing-to-appflowy) for details.
-
