@@ -89,6 +89,19 @@ class AppFlowyBoardController extends ChangeNotifier
     if (notify) notifyListeners();
   }
 
+  /// Inserts a new group at the given index
+  ///
+  /// If you don't want to notify the listener after inserting the new group, the
+  /// [notify] should set to false. Default value is true.
+  void insertGroup(int index, AppFlowyGroupData groupData, {bool notify = true}) {
+    if (_groupControllers[groupData.id] != null) return;
+
+    final controller = AppFlowyGroupController(groupData: groupData);
+    _groupDatas.insert(index, groupData);
+    _groupControllers[groupData.id] = controller;
+    if (notify) notifyListeners();
+  }
+
   /// Adds a list of groups to the end of the current group list.
   ///
   /// If you don't want to notify the listener after adding the groups, the
