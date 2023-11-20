@@ -325,11 +325,13 @@ class _AppFlowyBoardContentState extends State<_AppFlowyBoardContent> {
     }
 
     if (index == 0) {
-      return EdgeInsets.only(right: widget.config.groupPadding.right);
+      // remove the left padding of the first group
+      return widget.config.groupPadding.copyWith(left: 0);
     }
 
     if (index == widget.dataController.groupDatas.length - 1) {
-      return EdgeInsets.only(left: widget.config.groupPadding.left);
+      // remove the right padding of the last group
+      return widget.config.groupPadding.copyWith(right: 0);
     }
 
     return widget.config.groupPadding;
