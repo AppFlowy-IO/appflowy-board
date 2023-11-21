@@ -20,18 +20,25 @@ class AppFlowyBoardScrollController {
 }
 
 class AppFlowyBoardConfig {
+  // overall board
+  final EdgeInsets boardPadding;
   final double cornerRadius;
-  final EdgeInsets groupPadding;
-  final EdgeInsets groupItemPadding;
-  final EdgeInsets footerPadding;
-  final EdgeInsets headerPadding;
-  final EdgeInsets cardPadding;
+
+  // group card
   final Color groupBackgroundColor;
+  final EdgeInsets groupMargin;
+  final EdgeInsets footerPadding;
+  final EdgeInsets groupItemPadding;
+  final EdgeInsets headerPadding;
   final bool stretchGroupHeight;
 
+  // card
+  final EdgeInsets cardPadding;
+
   const AppFlowyBoardConfig({
+    this.boardPadding = EdgeInsets.zero,
     this.cornerRadius = 6.0,
-    this.groupPadding = const EdgeInsets.symmetric(horizontal: 8),
+    this.groupMargin = const EdgeInsets.symmetric(horizontal: 8),
     this.groupItemPadding = const EdgeInsets.symmetric(horizontal: 12),
     this.footerPadding = const EdgeInsets.symmetric(horizontal: 12),
     this.headerPadding = const EdgeInsets.symmetric(horizontal: 16),
@@ -209,34 +216,37 @@ class _AppFlowyBoardContentState extends State<_AppFlowyBoardContent> {
     super.initState();
     _overlayEntry = BoardOverlayEntry(
       builder: (BuildContext context) {
-        return Stack(
-          alignment: AlignmentDirectional.topStart,
-          children: [
-            if (widget.background != null)
-              Container(
-                clipBehavior: Clip.hardEdge,
-                decoration: BoxDecoration(
-                  borderRadius:
-                      BorderRadius.circular(widget.config.cornerRadius),
+        return Padding(
+          padding: widget.config.boardPadding,
+          child: Stack(
+            alignment: AlignmentDirectional.topStart,
+            children: [
+              if (widget.background != null)
+                Container(
+                  clipBehavior: Clip.hardEdge,
+                  decoration: BoxDecoration(
+                    borderRadius:
+                        BorderRadius.circular(widget.config.cornerRadius),
+                  ),
+                  child: widget.background,
                 ),
-                child: widget.background,
+              ReorderFlex(
+                config: widget.reorderFlexConfig,
+                scrollController: widget.scrollController,
+                onReorder: widget.onReorder,
+                dataSource: widget.dataController,
+                interceptor: OverlappingDragTargetInterceptor(
+                  reorderFlexId: widget.dataController.identifier,
+                  acceptedReorderFlexId: widget.dataController.groupIds,
+                  delegate: widget.delegate,
+                  columnsState: widget.boardState,
+                ),
+                leading: widget.leading,
+                trailing: widget.trailing,
+                children: _buildColumns(),
               ),
-            ReorderFlex(
-              config: widget.reorderFlexConfig,
-              scrollController: widget.scrollController,
-              onReorder: widget.onReorder,
-              dataSource: widget.dataController,
-              interceptor: OverlappingDragTargetInterceptor(
-                reorderFlexId: widget.dataController.identifier,
-                acceptedReorderFlexId: widget.dataController.groupIds,
-                delegate: widget.delegate,
-                columnsState: widget.boardState,
-              ),
-              leading: widget.leading,
-              trailing: widget.trailing,
-              children: _buildColumns(),
-            ),
-          ],
+            ],
+          ),
         );
       },
       opaque: false,
@@ -321,20 +331,20 @@ class _AppFlowyBoardContentState extends State<_AppFlowyBoardContent> {
 
   EdgeInsets _marginFromIndex(int index) {
     if (widget.dataController.groupDatas.isEmpty) {
-      return widget.config.groupPadding;
+      return widget.config.groupMargin;
     }
 
     if (index == 0) {
       // remove the left padding of the first group
-      return widget.config.groupPadding.copyWith(left: 0);
+      return widget.config.groupMargin.copyWith(left: 0);
     }
 
     if (index == widget.dataController.groupDatas.length - 1) {
       // remove the right padding of the last group
-      return widget.config.groupPadding.copyWith(right: 0);
+      return widget.config.groupMargin.copyWith(right: 0);
     }
 
-    return widget.config.groupPadding;
+    return widget.config.groupMargin;
   }
 }
 
