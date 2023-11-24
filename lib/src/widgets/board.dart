@@ -20,24 +20,31 @@ class AppFlowyBoardScrollController {
 }
 
 class AppFlowyBoardConfig {
-  final double cornerRadius;
-  final EdgeInsets groupPadding;
-  final EdgeInsets groupItemPadding;
-  final EdgeInsets footerPadding;
-  final EdgeInsets headerPadding;
-  final EdgeInsets cardPadding;
+  // board
+  final double boardCornerRadius;
+
+  // group
   final Color groupBackgroundColor;
+  final double groupCornerRadius;
+  final EdgeInsets groupMargin;
+  final EdgeInsets groupHeaderPadding;
+  final EdgeInsets groupBodyPadding;
+  final EdgeInsets groupFooterPadding;
   final bool stretchGroupHeight;
 
+  // card
+  final EdgeInsets cardMargin;
+
   const AppFlowyBoardConfig({
-    this.cornerRadius = 6.0,
-    this.groupPadding = const EdgeInsets.symmetric(horizontal: 8),
-    this.groupItemPadding = const EdgeInsets.symmetric(horizontal: 12),
-    this.footerPadding = const EdgeInsets.symmetric(horizontal: 12),
-    this.headerPadding = const EdgeInsets.symmetric(horizontal: 16),
-    this.cardPadding = const EdgeInsets.symmetric(horizontal: 3, vertical: 4),
+    this.boardCornerRadius = 6.0,
+    this.groupCornerRadius = 6.0,
     this.groupBackgroundColor = Colors.transparent,
+    this.groupMargin = const EdgeInsets.symmetric(horizontal: 8),
+    this.groupHeaderPadding = const EdgeInsets.symmetric(horizontal: 16),
+    this.groupBodyPadding = const EdgeInsets.symmetric(horizontal: 12),
+    this.groupFooterPadding = const EdgeInsets.symmetric(horizontal: 12),
     this.stretchGroupHeight = true,
+    this.cardMargin = const EdgeInsets.symmetric(horizontal: 3, vertical: 4),
   });
 }
 
@@ -217,7 +224,7 @@ class _AppFlowyBoardContentState extends State<_AppFlowyBoardContent> {
                 clipBehavior: Clip.hardEdge,
                 decoration: BoxDecoration(
                   borderRadius:
-                      BorderRadius.circular(widget.config.cornerRadius),
+                      BorderRadius.circular(widget.config.boardCornerRadius),
                 ),
                 child: widget.background,
               ),
@@ -278,7 +285,7 @@ class _AppFlowyBoardContentState extends State<_AppFlowyBoardContent> {
                   constraints: widget.groupConstraints,
                   child: AppFlowyBoardGroup(
                     margin: _marginFromIndex(columnIndex),
-                    itemMargin: widget.config.groupItemPadding,
+                    bodyPadding: widget.config.groupBodyPadding,
                     headerBuilder: _buildHeader,
                     footerBuilder: widget.footerBuilder,
                     cardBuilder: widget.cardBuilder,
@@ -286,7 +293,7 @@ class _AppFlowyBoardContentState extends State<_AppFlowyBoardContent> {
                     scrollController: ScrollController(),
                     phantomController: widget.phantomController,
                     onReorder: widget.dataController.moveGroupItem,
-                    cornerRadius: widget.config.cornerRadius,
+                    cornerRadius: widget.config.groupCornerRadius,
                     backgroundColor: widget.config.groupBackgroundColor,
                     dragStateStorage: widget.boardState,
                     dragTargetKeys: widget.boardState,
@@ -321,18 +328,20 @@ class _AppFlowyBoardContentState extends State<_AppFlowyBoardContent> {
 
   EdgeInsets _marginFromIndex(int index) {
     if (widget.dataController.groupDatas.isEmpty) {
-      return widget.config.groupPadding;
+      return widget.config.groupMargin;
     }
 
     if (index == 0) {
-      return EdgeInsets.only(right: widget.config.groupPadding.right);
+      // remove the left padding of the first group
+      return widget.config.groupMargin.copyWith(left: 0);
     }
 
     if (index == widget.dataController.groupDatas.length - 1) {
-      return EdgeInsets.only(left: widget.config.groupPadding.left);
+      // remove the right padding of the last group
+      return widget.config.groupMargin.copyWith(right: 0);
     }
 
-    return widget.config.groupPadding;
+    return widget.config.groupMargin;
   }
 }
 

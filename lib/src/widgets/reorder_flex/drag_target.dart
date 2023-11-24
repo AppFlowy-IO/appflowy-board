@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:appflowy_board/appflowy_board.dart';
 import 'package:appflowy_board/src/utils/log.dart';
 import 'package:flutter/material.dart';
@@ -157,15 +159,19 @@ class _ReorderDragTargetState<T extends DragTargetData>
     });
 
     final draggableWidget = widget.draggableTargetBuilder?.build(
-          context,
-          widget.child,
-          widget.onDragStarted,
-          widget.onDragEnded,
-          widget.onWillAccept,
-          widget.insertAnimationController,
-          widget.deleteAnimationController,
-        ) ??
-        Draggable<DragTargetData>(
+      context,
+      widget.child,
+      widget.onDragStarted,
+      widget.onDragEnded,
+      widget.onWillAccept,
+      widget.insertAnimationController,
+      widget.deleteAnimationController,
+    );
+
+    if (draggableWidget == null) {
+      if ((Platform.isIOS || Platform.isAndroid)) {
+        // On mobile, we use [LongPressDraggable] to avoid conflicts with scrolling screen behavior. The configuration of [LongPressDraggable] is the same as [Draggable].
+        return LongPressDraggable<DragTargetData>(
           axis: widget.dragDirection,
           maxSimultaneousDrags: widget.draggable ? 1 : 0,
           data: widget.dragTargetData,
@@ -200,6 +206,43 @@ class _ReorderDragTargetState<T extends DragTargetData>
           },
           child: widget.child,
         );
+      }
+      return Draggable<DragTargetData>(
+        axis: widget.dragDirection,
+        maxSimultaneousDrags: widget.draggable ? 1 : 0,
+        data: widget.dragTargetData,
+        ignoringFeedbackSemantics: false,
+        feedback: feedbackBuilder,
+        childWhenDragging: IgnorePointerWidget(
+          useIntrinsicSize: !widget.useMoveAnimation,
+          opacity: widget.draggingOpacity,
+          child: widget.child,
+        ),
+        onDragStarted: () {
+          _draggingFeedbackSize = widget.indexGlobalKey.currentContext?.size;
+          widget.onDragStarted(
+            widget.child,
+            widget.dragTargetData.draggingIndex,
+            _draggingFeedbackSize,
+          );
+        },
+        dragAnchorStrategy: childDragAnchorStrategy,
+
+        /// When the drag ends inside a DragTarget widget, the drag
+        /// succeeds, and we reorder the widget into position appropriately.
+        onDragCompleted: () {
+          widget.onDragEnded(widget.dragTargetData);
+        },
+
+        /// When the drag does not end inside a DragTarget widget, the
+        /// drag fails, but we still reorder the widget to the last position it
+        /// had been dragged to.
+        onDraggableCanceled: (Velocity velocity, Offset offset) {
+          widget.onDragEnded(widget.dragTargetData);
+        },
+        child: widget.child,
+      );
+    }
 
     return draggableWidget;
   }

@@ -82,7 +82,7 @@ class AppFlowyBoardGroup extends StatefulWidget {
 
   final EdgeInsets margin;
 
-  final EdgeInsets itemMargin;
+  final EdgeInsets bodyPadding;
 
   final double cornerRadius;
 
@@ -111,7 +111,7 @@ class AppFlowyBoardGroup extends StatefulWidget {
     this.onDragStarted,
     this.onDragEnded,
     this.margin = EdgeInsets.zero,
-    this.itemMargin = EdgeInsets.zero,
+    this.bodyPadding = EdgeInsets.zero,
     this.cornerRadius = 0.0,
     this.backgroundColor = Colors.transparent,
     this.stretchGroupHeight = true,
@@ -177,7 +177,7 @@ class _AppFlowyBoardGroupState extends State<AppFlowyBoardGroup> {
 
         reorderFlex = Flexible(
           fit: widget.stretchGroupHeight ? FlexFit.tight : FlexFit.loose,
-          child: Padding(padding: widget.itemMargin, child: reorderFlex),
+          child: Padding(padding: widget.bodyPadding, child: reorderFlex),
         );
 
         return Container(
