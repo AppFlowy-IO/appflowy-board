@@ -77,7 +77,7 @@ class _MultiBoardListExampleState extends State<MultiBoardListExample> {
             icon: const Icon(Icons.add, size: 20),
             title: const Text('New'),
             height: 50,
-            margin: config.groupItemPadding,
+            margin: config.groupBodyPadding,
             onAddButtonClick: () {
               boardController.scrollToBottom(columnData.id);
             },
@@ -101,7 +101,7 @@ class _MultiBoardListExampleState extends State<MultiBoardListExample> {
             addIcon: const Icon(Icons.add, size: 20),
             moreIcon: const Icon(Icons.more_horiz, size: 20),
             height: 50,
-            margin: config.groupItemPadding,
+            margin: config.groupBodyPadding,
           );
         },
         groupConstraints: const BoxConstraints.tightFor(width: 240),

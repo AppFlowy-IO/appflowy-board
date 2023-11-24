@@ -20,31 +20,31 @@ class AppFlowyBoardScrollController {
 }
 
 class AppFlowyBoardConfig {
-  // overall board
-  final EdgeInsets boardPadding;
-  final double cornerRadius;
+  // board
+  final double boardCornerRadius;
 
-  // group card
+  // group
   final Color groupBackgroundColor;
+  final double groupCornerRadius;
   final EdgeInsets groupMargin;
-  final EdgeInsets footerPadding;
-  final EdgeInsets groupItemPadding;
-  final EdgeInsets headerPadding;
+  final EdgeInsets groupHeaderPadding;
+  final EdgeInsets groupBodyPadding;
+  final EdgeInsets groupFooterPadding;
   final bool stretchGroupHeight;
 
   // card
-  final EdgeInsets cardPadding;
+  final EdgeInsets cardMargin;
 
   const AppFlowyBoardConfig({
-    this.boardPadding = EdgeInsets.zero,
-    this.cornerRadius = 6.0,
-    this.groupMargin = const EdgeInsets.symmetric(horizontal: 8),
-    this.groupItemPadding = const EdgeInsets.symmetric(horizontal: 12),
-    this.footerPadding = const EdgeInsets.symmetric(horizontal: 12),
-    this.headerPadding = const EdgeInsets.symmetric(horizontal: 16),
-    this.cardPadding = const EdgeInsets.symmetric(horizontal: 3, vertical: 4),
+    this.boardCornerRadius = 6.0,
+    this.groupCornerRadius = 6.0,
     this.groupBackgroundColor = Colors.transparent,
+    this.groupMargin = const EdgeInsets.symmetric(horizontal: 8),
+    this.groupHeaderPadding = const EdgeInsets.symmetric(horizontal: 16),
+    this.groupBodyPadding = const EdgeInsets.symmetric(horizontal: 12),
+    this.groupFooterPadding = const EdgeInsets.symmetric(horizontal: 12),
     this.stretchGroupHeight = true,
+    this.cardMargin = const EdgeInsets.symmetric(horizontal: 3, vertical: 4),
   });
 }
 
@@ -216,37 +216,34 @@ class _AppFlowyBoardContentState extends State<_AppFlowyBoardContent> {
     super.initState();
     _overlayEntry = BoardOverlayEntry(
       builder: (BuildContext context) {
-        return Padding(
-          padding: widget.config.boardPadding,
-          child: Stack(
-            alignment: AlignmentDirectional.topStart,
-            children: [
-              if (widget.background != null)
-                Container(
-                  clipBehavior: Clip.hardEdge,
-                  decoration: BoxDecoration(
-                    borderRadius:
-                        BorderRadius.circular(widget.config.cornerRadius),
-                  ),
-                  child: widget.background,
+        return Stack(
+          alignment: AlignmentDirectional.topStart,
+          children: [
+            if (widget.background != null)
+              Container(
+                clipBehavior: Clip.hardEdge,
+                decoration: BoxDecoration(
+                  borderRadius:
+                      BorderRadius.circular(widget.config.boardCornerRadius),
                 ),
-              ReorderFlex(
-                config: widget.reorderFlexConfig,
-                scrollController: widget.scrollController,
-                onReorder: widget.onReorder,
-                dataSource: widget.dataController,
-                interceptor: OverlappingDragTargetInterceptor(
-                  reorderFlexId: widget.dataController.identifier,
-                  acceptedReorderFlexId: widget.dataController.groupIds,
-                  delegate: widget.delegate,
-                  columnsState: widget.boardState,
-                ),
-                leading: widget.leading,
-                trailing: widget.trailing,
-                children: _buildColumns(),
+                child: widget.background,
               ),
-            ],
-          ),
+            ReorderFlex(
+              config: widget.reorderFlexConfig,
+              scrollController: widget.scrollController,
+              onReorder: widget.onReorder,
+              dataSource: widget.dataController,
+              interceptor: OverlappingDragTargetInterceptor(
+                reorderFlexId: widget.dataController.identifier,
+                acceptedReorderFlexId: widget.dataController.groupIds,
+                delegate: widget.delegate,
+                columnsState: widget.boardState,
+              ),
+              leading: widget.leading,
+              trailing: widget.trailing,
+              children: _buildColumns(),
+            ),
+          ],
         );
       },
       opaque: false,
@@ -288,7 +285,7 @@ class _AppFlowyBoardContentState extends State<_AppFlowyBoardContent> {
                   constraints: widget.groupConstraints,
                   child: AppFlowyBoardGroup(
                     margin: _marginFromIndex(columnIndex),
-                    itemMargin: widget.config.groupItemPadding,
+                    bodyPadding: widget.config.groupBodyPadding,
                     headerBuilder: _buildHeader,
                     footerBuilder: widget.footerBuilder,
                     cardBuilder: widget.cardBuilder,
@@ -296,7 +293,7 @@ class _AppFlowyBoardContentState extends State<_AppFlowyBoardContent> {
                     scrollController: ScrollController(),
                     phantomController: widget.phantomController,
                     onReorder: widget.dataController.moveGroupItem,
-                    cornerRadius: widget.config.cornerRadius,
+                    cornerRadius: widget.config.groupCornerRadius,
                     backgroundColor: widget.config.groupBackgroundColor,
                     dragStateStorage: widget.boardState,
                     dragTargetKeys: widget.boardState,
