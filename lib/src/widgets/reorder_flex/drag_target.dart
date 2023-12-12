@@ -89,6 +89,8 @@ class ReorderDragTarget<T extends DragTargetData> extends StatefulWidget {
 
   final ScrollController scrollController;
 
+  final double groupWidth;
+
   const ReorderDragTarget({
     Key? key,
     required this.child,
@@ -103,6 +105,7 @@ class ReorderDragTarget<T extends DragTargetData> extends StatefulWidget {
     required this.useMoveAnimation,
     required this.draggable,
     required this.scrollController,
+    required this.groupWidth,
     this.onAccept,
     this.onLeave,
     this.draggableTargetBuilder,
@@ -137,9 +140,10 @@ class _ReorderDragTargetState<T extends DragTargetData>
         final scrollController = widget.scrollController;
         final maxScrollExtent = scrollController.position.maxScrollExtent;
         final minScrollExtent = scrollController.position.minScrollExtent;
-        const expandDistance = 50;
+        const expandDistance = 20;
 
-        if (detail.offset.dx > MediaQuery.of(context).size.width / 2) {
+        if (detail.offset.dx >
+            MediaQuery.of(context).size.width - widget.groupWidth) {
           final newPosition =
               scrollController.offset + expandDistance > maxScrollExtent
                   ? maxScrollExtent

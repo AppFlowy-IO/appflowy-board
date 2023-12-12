@@ -122,6 +122,8 @@ class ReorderFlex extends StatefulWidget {
 
   final Widget? trailing;
 
+  final double groupWidth;
+
   ReorderFlex({
     super.key,
     required this.scrollController,
@@ -129,6 +131,7 @@ class ReorderFlex extends StatefulWidget {
     required this.children,
     required this.config,
     required this.onReorder,
+    required this.groupWidth,
     this.dragStateStorage,
     this.dragTargetKeys,
     this.onDragStarted,
@@ -419,6 +422,7 @@ class ReorderFlexState extends State<ReorderFlex>
         dragTargetId: reorderFlexItem.id,
         dragTargetIndexKey: indexKey,
       ),
+      groupWidth: widget.groupWidth,
       onDragStarted: (draggingWidget, draggingIndex, size) {
         Log.debug(
             "[DragTarget] Group:[${widget.dataSource.identifier}] start dragging item at $draggingIndex");
