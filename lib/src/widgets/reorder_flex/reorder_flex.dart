@@ -79,6 +79,8 @@ class ReorderFlexConfig {
   /// [direction] How to place the children, default is Axis.vertical
   final Axis direction;
 
+  /// [dragDirection] is used to limit the dragging direction
+  /// If it is null, the widget can be dragged in any direction.
   final Axis? dragDirection;
 
   const ReorderFlexConfig({
@@ -120,13 +122,16 @@ class ReorderFlex extends StatefulWidget {
 
   final Widget? trailing;
 
+  final double groupWidth;
+
   ReorderFlex({
     super.key,
-    this.scrollController,
+    required this.scrollController,
     required this.dataSource,
     required this.children,
     required this.config,
     required this.onReorder,
+    required this.groupWidth,
     this.dragStateStorage,
     this.dragTargetKeys,
     this.onDragStarted,
@@ -350,7 +355,6 @@ class ReorderFlexState extends State<ReorderFlex>
           }
         }
 
-        ///
         if (draggingState.isPhantomBelowDragTarget()) {
           _notifier.updateDragTargetIndex(currentIndex);
           if (shiftedIndex == currentIndex && childIndex == dragPhantomIndex) {
@@ -407,6 +411,7 @@ class ReorderFlexState extends State<ReorderFlex>
   ) {
     final reorderFlexItem = widget.dataSource.items[dragTargetIndex];
     return ReorderDragTarget<FlexDragTargetData>(
+      scrollController: _scrollController,
       indexGlobalKey: indexKey,
       draggable: draggable,
       dragTargetData: FlexDragTargetData(
@@ -417,6 +422,7 @@ class ReorderFlexState extends State<ReorderFlex>
         dragTargetId: reorderFlexItem.id,
         dragTargetIndexKey: indexKey,
       ),
+      groupWidth: widget.groupWidth,
       onDragStarted: (draggingWidget, draggingIndex, size) {
         Log.debug(
             "[DragTarget] Group:[${widget.dataSource.identifier}] start dragging item at $draggingIndex");
@@ -592,8 +598,7 @@ class ReorderFlexState extends State<ReorderFlex>
   }
 
   Widget _wrapScrollView({required Widget child}) {
-    if (widget.scrollController != null &&
-        PrimaryScrollController.maybeOf(context) == null) {
+    if (PrimaryScrollController.maybeOf(context) == null) {
       return child;
     } else {
       return Scrollbar(

@@ -87,6 +87,10 @@ class ReorderDragTarget<T extends DragTargetData> extends StatefulWidget {
 
   final Axis? dragDirection;
 
+  final ScrollController scrollController;
+
+  final double groupWidth;
+
   const ReorderDragTarget({
     Key? key,
     required this.child,
@@ -100,6 +104,8 @@ class ReorderDragTarget<T extends DragTargetData> extends StatefulWidget {
     required this.deleteAnimationController,
     required this.useMoveAnimation,
     required this.draggable,
+    required this.scrollController,
+    required this.groupWidth,
     this.onAccept,
     this.onLeave,
     this.draggableTargetBuilder,
@@ -129,6 +135,29 @@ class _ReorderDragTargetState<T extends DragTargetData>
       },
       onAccept: widget.onAccept,
       onMove: (detail) {
+        // Expand the scroll view horizontally when the dragging is near the edge of the scroll view.
+        // It is used to move card to the other group.
+        final scrollController = widget.scrollController;
+        final maxScrollExtent = scrollController.position.maxScrollExtent;
+        final minScrollExtent = scrollController.position.minScrollExtent;
+        const expandDistance = 20;
+
+        if (detail.offset.dx >
+            MediaQuery.of(context).size.width - widget.groupWidth) {
+          final newPosition =
+              scrollController.offset + expandDistance > maxScrollExtent
+                  ? maxScrollExtent
+                  : scrollController.offset + expandDistance;
+          widget.scrollController.jumpTo(newPosition);
+        }
+        if (detail.offset.dx < 20) {
+          final newPosition =
+              scrollController.offset - expandDistance < minScrollExtent
+                  ? minScrollExtent
+                  : scrollController.offset - expandDistance;
+          widget.scrollController.jumpTo(newPosition);
+        }
+
         widget.onDragMoved(detail.data, detail.offset);
       },
       onLeave: (dragTargetData) {

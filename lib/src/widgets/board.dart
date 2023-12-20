@@ -241,6 +241,7 @@ class _AppFlowyBoardContentState extends State<_AppFlowyBoardContent> {
               ),
               leading: widget.leading,
               trailing: widget.trailing,
+              groupWidth: widget.groupConstraints.maxWidth,
               children: _buildColumns(),
             ),
           ],
@@ -283,22 +284,27 @@ class _AppFlowyBoardContentState extends State<_AppFlowyBoardContent> {
               builder: (context, value, child) {
                 return ConstrainedBox(
                   constraints: widget.groupConstraints,
-                  child: AppFlowyBoardGroup(
-                    margin: _marginFromIndex(columnIndex),
-                    bodyPadding: widget.config.groupBodyPadding,
-                    headerBuilder: _buildHeader,
-                    footerBuilder: widget.footerBuilder,
-                    cardBuilder: widget.cardBuilder,
-                    dataSource: dataSource,
-                    scrollController: ScrollController(),
-                    phantomController: widget.phantomController,
-                    onReorder: widget.dataController.moveGroupItem,
-                    cornerRadius: widget.config.groupCornerRadius,
-                    backgroundColor: widget.config.groupBackgroundColor,
-                    dragStateStorage: widget.boardState,
-                    dragTargetKeys: widget.boardState,
-                    reorderFlexAction: reorderFlexAction,
-                    stretchGroupHeight: widget.config.stretchGroupHeight,
+                  child: LayoutBuilder(
+                    // use LayoutBuilder to get the width of the group
+                    // and pass it to be used in [ReorderDragTarget]
+                    builder: (context, constraints) => AppFlowyBoardGroup(
+                      margin: _marginFromIndex(columnIndex),
+                      bodyPadding: widget.config.groupBodyPadding,
+                      headerBuilder: _buildHeader,
+                      footerBuilder: widget.footerBuilder,
+                      cardBuilder: widget.cardBuilder,
+                      dataSource: dataSource,
+                      scrollController: ScrollController(),
+                      phantomController: widget.phantomController,
+                      onReorder: widget.dataController.moveGroupItem,
+                      cornerRadius: widget.config.groupCornerRadius,
+                      backgroundColor: widget.config.groupBackgroundColor,
+                      dragStateStorage: widget.boardState,
+                      dragTargetKeys: widget.boardState,
+                      reorderFlexAction: reorderFlexAction,
+                      stretchGroupHeight: widget.config.stretchGroupHeight,
+                      groupWidth: constraints.maxWidth,
+                    ),
                   ),
                 );
               },
