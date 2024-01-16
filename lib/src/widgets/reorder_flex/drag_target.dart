@@ -2,9 +2,11 @@ import 'dart:io';
 
 import 'package:appflowy_board/appflowy_board.dart';
 import 'package:appflowy_board/src/utils/log.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
+
 import '../transitions.dart';
 
 abstract class DragTargetData {
@@ -198,7 +200,7 @@ class _ReorderDragTargetState<T extends DragTargetData>
     );
 
     if (draggableWidget == null) {
-      if ((Platform.isIOS || Platform.isAndroid)) {
+      if (!kIsWeb && (Platform.isIOS || Platform.isAndroid)) {
         // On mobile, we use [LongPressDraggable] to avoid conflicts with scrolling screen behavior. The configuration of [LongPressDraggable] is the same as [Draggable].
         return LongPressDraggable<DragTargetData>(
           axis: widget.dragDirection,
