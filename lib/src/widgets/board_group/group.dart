@@ -88,6 +88,8 @@ class AppFlowyBoardGroup extends StatefulWidget {
 
   final Color backgroundColor;
 
+  final List<BoxShadow>? boxShadow;
+
   final bool stretchGroupHeight;
 
   final DraggingStateStorage? dragStateStorage;
@@ -116,6 +118,7 @@ class AppFlowyBoardGroup extends StatefulWidget {
     this.margin = EdgeInsets.zero,
     this.bodyPadding = EdgeInsets.zero,
     this.cornerRadius = 0.0,
+    this.boxShadow,
     this.backgroundColor = Colors.transparent,
     this.stretchGroupHeight = true,
   })  : config = const ReorderFlexConfig(),
@@ -189,7 +192,7 @@ class _AppFlowyBoardGroupState extends State<AppFlowyBoardGroup> {
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
             color: widget.backgroundColor,
-            borderRadius: BorderRadius.circular(widget.cornerRadius),
+            borderRadius: BorderRadius.circular(widget.cornerRadius), boxShadow: widget.boxShadow,
           ),
           child: Flex(
             direction: Axis.vertical,

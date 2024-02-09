@@ -31,7 +31,7 @@ class AppFlowyBoardConfig {
   final EdgeInsets groupBodyPadding;
   final EdgeInsets groupFooterPadding;
   final bool stretchGroupHeight;
-
+  final List<BoxShadow>? boxShadow;
   // card
   final EdgeInsets cardMargin;
 
@@ -45,6 +45,7 @@ class AppFlowyBoardConfig {
     this.groupFooterPadding = const EdgeInsets.symmetric(horizontal: 12),
     this.stretchGroupHeight = true,
     this.cardMargin = const EdgeInsets.symmetric(horizontal: 3, vertical: 4),
+    this.boxShadow,
   });
 }
 
