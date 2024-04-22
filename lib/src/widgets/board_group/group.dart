@@ -39,7 +39,7 @@ typedef AppFlowyBoardFooterBuilder = Widget Function(
   AppFlowyGroupData groupData,
 );
 
-abstract class AppFlowyGroupDataDataSource extends ReoderFlexDataSource {
+abstract class AppFlowyGroupDataDataSource with ReoderFlexDataSource {
   AppFlowyGroupData get groupData;
 
   List<String> get acceptedGroupIds;
@@ -92,14 +92,14 @@ class AppFlowyBoardGroup extends StatefulWidget {
 
   final DraggingStateStorage? dragStateStorage;
 
-  final ReorderDragTargeKeys? dragTargetKeys;
+  final ReorderDragTargetKeys? dragTargetKeys;
 
   final ReorderFlexAction? reorderFlexAction;
 
   final double groupWidth;
 
   const AppFlowyBoardGroup({
-    Key? key,
+    super.key,
     this.headerBuilder,
     this.footerBuilder,
     required this.cardBuilder,
@@ -118,8 +118,7 @@ class AppFlowyBoardGroup extends StatefulWidget {
     this.cornerRadius = 0.0,
     this.backgroundColor = Colors.transparent,
     this.stretchGroupHeight = true,
-  })  : config = const ReorderFlexConfig(),
-        super(key: key);
+  }) : config = const ReorderFlexConfig();
 
   @override
   State<AppFlowyBoardGroup> createState() => _AppFlowyBoardGroupState();

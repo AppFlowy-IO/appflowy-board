@@ -68,9 +68,9 @@ class BoardOverlay extends StatefulWidget {
   final List<BoardOverlayEntry> initialEntries;
 
   const BoardOverlay({
+    super.key,
     this.initialEntries = const <BoardOverlayEntry>[],
-    Key? key,
-  }) : super(key: key);
+  });
 
   static BoardOverlayState of(BuildContext context,
       {Widget? debugRequiredFor}) {
@@ -243,9 +243,8 @@ class _BoardStackElement extends RenderObjectElement {
   late List<Element> _offstage;
   final Set<Element> _forgottenOffstageChildren = HashSet<Element>();
 
-  _BoardStackElement(_BoardStack widget)
-      : assert(!debugChildrenHaveDuplicateKeys(widget, widget.offstage)),
-        super(widget);
+  _BoardStackElement(_BoardStack super.widget)
+      : assert(!debugChildrenHaveDuplicateKeys(widget, widget.offstage));
 
   @override
   _BoardStack get widget => super.widget as _BoardStack;
@@ -357,13 +356,17 @@ class _RenderBoardObject extends RenderBox
 
   @override
   void redepthChildren() {
-    if (child != null) redepthChild(child!);
+    if (child != null) {
+      redepthChild(child!);
+    }
     super.redepthChildren();
   }
 
   @override
   void visitChildren(RenderObjectVisitor visitor) {
-    if (child != null) visitor(child!);
+    if (child != null) {
+      visitor(child!);
+    }
     super.visitChildren(visitor);
   }
 
@@ -403,6 +406,8 @@ class _RenderBoardObject extends RenderBox
 
   @override
   void visitChildrenForSemantics(RenderObjectVisitor visitor) {
-    if (child != null) visitor(child!);
+    if (child != null) {
+      visitor(child!);
+    }
   }
 }

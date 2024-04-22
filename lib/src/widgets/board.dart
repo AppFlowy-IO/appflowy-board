@@ -1,6 +1,7 @@
-import 'package:appflowy_board/src/utils/log.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import '../utils/log.dart';
 import 'board_data.dart';
 import 'board_group/group.dart';
 import 'board_group/group_data.dart';
@@ -13,8 +14,10 @@ import '../rendering/board_overlay.dart';
 class AppFlowyBoardScrollController {
   AppFlowyBoardState? _boardState;
 
-  void scrollToBottom(String groupId,
-      {void Function(BuildContext)? completed}) {
+  void scrollToBottom(
+    String groupId, {
+    void Function(BuildContext)? completed,
+  }) {
     _boardState?.reorderFlexActionMap[groupId]?.scrollToBottom(completed);
   }
 }
@@ -376,7 +379,7 @@ class AppFlowyGroupContext {
 }
 
 class AppFlowyBoardState extends DraggingStateStorage
-    with ReorderDragTargeKeys {
+    with ReorderDragTargetKeys {
   final Map<String, DraggingState> groupDragStates = {};
   final Map<String, Map<String, GlobalObjectKey>> groupDragTargetKeys = {};
 
