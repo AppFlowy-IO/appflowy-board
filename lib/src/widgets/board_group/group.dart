@@ -39,7 +39,7 @@ typedef AppFlowyBoardFooterBuilder = Widget Function(
   AppFlowyGroupData groupData,
 );
 
-abstract class AppFlowyGroupDataDataSource with ReoderFlexDataSource {
+abstract class AppFlowyGroupDataDataSource implements ReoderFlexDataSource {
   AppFlowyGroupData get groupData;
 
   List<String> get acceptedGroupIds;

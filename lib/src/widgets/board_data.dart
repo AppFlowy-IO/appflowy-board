@@ -45,7 +45,8 @@ typedef OnMoveGroupItemToGroup = void Function(
 /// [onMoveGroupItemToGroup] will get called when moving the group's item from
 /// one group to another group.
 class AppFlowyBoardController extends ChangeNotifier
-    with EquatableMixin, BoardPhantomControllerDelegate, ReoderFlexDataSource {
+    with EquatableMixin
+    implements BoardPhantomControllerDelegate, ReoderFlexDataSource {
   final List<AppFlowyGroupData> _groupDatas = [];
 
   /// [onMoveGroup] will get called when moving the group from one position to

@@ -7,7 +7,7 @@ import '../reorder_flex/drag_target.dart';
 import '../reorder_flex/drag_target_interceptor.dart';
 import 'phantom_state.dart';
 
-mixin BoardPhantomControllerDelegate {
+abstract class BoardPhantomControllerDelegate {
   AppFlowyGroupController? controller(String groupId);
 
   bool removePhantom(String groupId);
@@ -36,7 +36,7 @@ mixin BoardPhantomControllerDelegate {
 }
 
 class BoardPhantomController extends OverlapDragTargetDelegate
-    with CrossReorderFlexDragTargetDelegate {
+    implements CrossReorderFlexDragTargetDelegate {
   PhantomRecord? phantomRecord;
   final BoardPhantomControllerDelegate delegate;
   final AppFlowyBoardState groupsState;
@@ -298,7 +298,7 @@ class PhantomGroupItem extends AppFlowyGroupItem {
 }
 
 class PassthroughPhantomContext extends FakeDragTargetEventTrigger
-    with FakeDragTargetEventData, PassthroughPhantomListener {
+    implements FakeDragTargetEventData, PassthroughPhantomListener {
   @override
   int index;
 

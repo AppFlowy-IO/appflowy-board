@@ -520,7 +520,7 @@ abstract class FakeDragTargetEventTrigger {
   void fakeOnDragEnded(VoidCallback callback);
 }
 
-mixin FakeDragTargetEventData {
+abstract class FakeDragTargetEventData {
   Size? get feedbackSize;
   int get index;
   DragTargetData get dragTargetData;

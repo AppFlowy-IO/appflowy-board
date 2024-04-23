@@ -20,7 +20,7 @@ typedef OnReceivePassedInPhantom = void Function(
   int phantomIndex,
 );
 
-mixin ReoderFlexDataSource {
+abstract class ReoderFlexDataSource {
   /// [identifier] represents the id the [ReorderFlex]. It must be unique.
   String get identifier;
 
@@ -40,7 +40,7 @@ abstract class ReoderFlexItem {
 /// For the moment, the key is used to locate the render object that will
 /// be passed in the [ScrollPosition]'s [ensureVisible] function.
 ///
-mixin ReorderDragTargetKeys {
+abstract class ReorderDragTargetKeys {
   void insertDragTarget(
     String reorderFlexId,
     String key,

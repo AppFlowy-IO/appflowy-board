@@ -117,7 +117,7 @@ class OverlappingDragTargetInterceptor extends DragTargetInterceptor {
   }
 }
 
-mixin CrossReorderFlexDragTargetDelegate {
+abstract class CrossReorderFlexDragTargetDelegate {
   /// * [reorderFlexId] is the id that the [ReorderFlex] passed in.
   bool acceptNewDragTargetData(
     String reorderFlexId,

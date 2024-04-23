@@ -379,7 +379,7 @@ class AppFlowyGroupContext {
 }
 
 class AppFlowyBoardState extends DraggingStateStorage
-    with ReorderDragTargetKeys {
+    implements ReorderDragTargetKeys {
   final Map<String, DraggingState> groupDragStates = {};
   final Map<String, Map<String, GlobalObjectKey>> groupDragTargetKeys = {};
 
