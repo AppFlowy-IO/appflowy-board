@@ -1,11 +1,14 @@
 import 'dart:collection';
 
-import 'package:appflowy_board/src/widgets/board_group/group_data.dart';
+import 'package:flutter/material.dart';
+
 import 'package:equatable/equatable.dart';
 
+import 'package:appflowy_board/src/widgets/board_group/group_data.dart';
+
 import '../utils/log.dart';
+
 import 'reorder_flex/reorder_flex.dart';
-import 'package:flutter/material.dart';
 import 'reorder_phantom/phantom_controller.dart';
 
 typedef OnMoveGroup = void Function(
@@ -47,6 +50,12 @@ typedef OnMoveGroupItemToGroup = void Function(
 class AppFlowyBoardController extends ChangeNotifier
     with EquatableMixin
     implements BoardPhantomControllerDelegate, ReoderFlexDataSource {
+  AppFlowyBoardController({
+    this.onMoveGroup,
+    this.onMoveGroupItem,
+    this.onMoveGroupItemToGroup,
+  });
+
   final List<AppFlowyGroupData> _groupDatas = [];
 
   /// [onMoveGroup] will get called when moving the group from one position to
@@ -70,12 +79,6 @@ class AppFlowyBoardController extends ChangeNotifier
 
   final LinkedHashMap<String, AppFlowyGroupController> _groupControllers =
       LinkedHashMap();
-
-  AppFlowyBoardController({
-    this.onMoveGroup,
-    this.onMoveGroupItem,
-    this.onMoveGroupItemToGroup,
-  });
 
   /// Adds a new group to the end of the current group list.
   ///
@@ -127,7 +130,7 @@ class AppFlowyBoardController extends ChangeNotifier
     final index = _groupDatas.indexWhere((group) => group.id == groupId);
     if (index == -1) {
       Log.warn(
-        'Try to remove Group:[$groupId] failed. Group:[$groupId] not exist',
+        'Try to remove Group:[$groupId] failed. Group:[$groupId] does not exist',
       );
     }
 
@@ -226,7 +229,7 @@ class AppFlowyBoardController extends ChangeNotifier
   }
 
   void enableGroupDragging(bool isEnable) {
-    for (var groupController in _groupControllers.values) {
+    for (final groupController in _groupControllers.values) {
       groupController.enableDragging(isEnable);
     }
 
@@ -262,14 +265,11 @@ class AppFlowyBoardController extends ChangeNotifier
   }
 
   @override
-  List<Object?> get props {
-    return [_groupDatas];
-  }
+  List<Object?> get props => [_groupDatas];
 
   @override
-  AppFlowyGroupController? controller(String groupId) {
-    return _groupControllers[groupId];
-  }
+  AppFlowyGroupController? controller(String groupId) =>
+      _groupControllers[groupId];
 
   @override
   String get identifier => '$AppFlowyBoardController';
@@ -319,7 +319,6 @@ class AppFlowyBoardController extends ChangeNotifier
 
   @override
   @protected
-  void insertPhantom(String groupId, int index, PhantomGroupItem item) {
-    getGroupController(groupId)!.insert(index, item);
-  }
+  void insertPhantom(String groupId, int index, PhantomGroupItem item) =>
+      getGroupController(groupId)!.insert(index, item);
 }

@@ -1,5 +1,6 @@
-import 'package:appflowy_board/appflowy_board.dart';
 import 'package:flutter/material.dart';
+
+import 'package:appflowy_board/appflowy_board.dart';
 
 class MultiBoardListExample extends StatefulWidget {
   const MultiBoardListExample({Key? key}) : super(key: key);
@@ -25,6 +26,7 @@ class _MultiBoardListExampleState extends State<MultiBoardListExample> {
 
   @override
   void initState() {
+    super.initState();
     boardController = AppFlowyBoardScrollController();
     final group1 = AppFlowyGroupData(id: "To Do", name: "To Do", items: [
       TextItem("Card 1"),
@@ -74,8 +76,6 @@ class _MultiBoardListExampleState extends State<MultiBoardListExample> {
     controller.addGroup(group3);
     controller.addGroup(group4);
     controller.addGroup(group5);
-
-    super.initState();
   }
 
   @override
@@ -160,11 +160,6 @@ class RichTextCard extends StatefulWidget {
 }
 
 class _RichTextCardState extends State<RichTextCard> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Align(

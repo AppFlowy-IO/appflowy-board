@@ -1,10 +1,12 @@
-import 'package:appflowy_board/appflowy_board.dart';
 import 'package:flutter/widgets.dart';
+
+import 'package:appflowy_board/appflowy_board.dart';
 
 import '../../utils/log.dart';
 import '../reorder_flex/drag_state.dart';
 import '../reorder_flex/drag_target.dart';
 import '../reorder_flex/drag_target_interceptor.dart';
+
 import 'phantom_state.dart';
 
 abstract class BoardPhantomControllerDelegate {
@@ -37,14 +39,16 @@ abstract class BoardPhantomControllerDelegate {
 
 class BoardPhantomController extends OverlapDragTargetDelegate
     implements CrossReorderFlexDragTargetDelegate {
-  PhantomRecord? phantomRecord;
-  final BoardPhantomControllerDelegate delegate;
-  final AppFlowyBoardState groupsState;
-  final phantomState = GroupPhantomState();
   BoardPhantomController({
     required this.delegate,
     required this.groupsState,
   });
+
+  final BoardPhantomControllerDelegate delegate;
+  final AppFlowyBoardState groupsState;
+
+  PhantomRecord? phantomRecord;
+  final phantomState = GroupPhantomState();
 
   /// Determines whether the group should perform reorder
   ///
@@ -57,9 +61,8 @@ class BoardPhantomController extends OverlapDragTargetDelegate
     if (phantomRecord != null) {
       return phantomRecord!.toGroupId == groupId &&
           phantomRecord!.fromGroupId == groupId;
-    } else {
-      return true;
     }
+    return true;
   }
 
   void updateIndex(int fromIndex, int toIndex) {
@@ -224,9 +227,9 @@ class BoardPhantomController extends OverlapDragTargetDelegate
     final controller = delegate.controller(dragTargetId);
     if (controller != null) {
       return controller.groupData.items.length;
-    } else {
-      return 0;
     }
+
+    return 0;
   }
 }
 
@@ -239,12 +242,6 @@ class BoardPhantomController extends OverlapDragTargetDelegate
 /// [toGroupIndex] the index of the phantom moves into the group
 ///
 class PhantomRecord {
-  final String fromGroupId;
-  int fromGroupIndex;
-
-  final String toGroupId;
-  int toGroupIndex;
-
   PhantomRecord({
     required this.toGroupId,
     required this.toGroupIndex,
@@ -252,9 +249,12 @@ class PhantomRecord {
     required this.fromGroupIndex,
   });
 
-  void updateFromGroupIndex(int index) {
-    fromGroupIndex = index;
-  }
+  final String toGroupId;
+  int toGroupIndex;
+  final String fromGroupId;
+  int fromGroupIndex;
+
+  void updateFromGroupIndex(int index) => fromGroupIndex = index;
 
   void updateInsertedIndex(int index) {
     if (toGroupIndex == index) {
@@ -268,16 +268,15 @@ class PhantomRecord {
   }
 
   @override
-  String toString() {
-    return 'Group:[$fromGroupId]:$fromGroupIndex to Group:[$toGroupId]:$toGroupIndex';
-  }
+  String toString() =>
+      'Group:[$fromGroupId]:$fromGroupIndex to Group:[$toGroupId]:$toGroupIndex';
 }
 
 class PhantomGroupItem extends AppFlowyGroupItem {
-  final PassthroughPhantomContext phantomContext;
-
   PhantomGroupItem(PassthroughPhantomContext insertedPhantom)
       : phantomContext = insertedPhantom;
+
+  final PassthroughPhantomContext phantomContext;
 
   @override
   bool get isPhantom => true;
@@ -292,13 +291,16 @@ class PhantomGroupItem extends AppFlowyGroupItem {
       : phantomContext.draggingWidget!;
 
   @override
-  String toString() {
-    return 'phantom:$id';
-  }
+  String toString() => 'phantom:$id';
 }
 
 class PassthroughPhantomContext extends FakeDragTargetEventTrigger
     implements FakeDragTargetEventData, PassthroughPhantomListener {
+  PassthroughPhantomContext({
+    required this.index,
+    required this.dragTargetData,
+  });
+
   @override
   int index;
 
@@ -319,11 +321,6 @@ class PassthroughPhantomContext extends FakeDragTargetEventTrigger
   @override
   VoidCallback? onDragEnded;
 
-  PassthroughPhantomContext({
-    required this.index,
-    required this.dragTargetData,
-  });
-
   @override
   void fakeOnDragEnded(VoidCallback callback) {
     onDragEnded = callback;
@@ -336,13 +333,13 @@ class PassthroughPhantomContext extends FakeDragTargetEventTrigger
 }
 
 class PassthroughPhantomWidget extends PhantomWidget {
-  final PassthroughPhantomContext passthroughPhantomContext;
-
   PassthroughPhantomWidget({
     super.key,
     required super.opacity,
     required this.passthroughPhantomContext,
   }) : super(child: passthroughPhantomContext.draggingWidget);
+
+  final PassthroughPhantomContext passthroughPhantomContext;
 }
 
 class PhantomDraggableBuilder extends ReorderFlexDraggableTargetBuilder {
@@ -368,8 +365,8 @@ class PhantomDraggableBuilder extends ReorderFlexDraggableTargetBuilder {
         deleteAnimationController: deleteAnimationController,
         child: child,
       );
-    } else {
-      return null;
     }
+
+    return null;
   }
 }
