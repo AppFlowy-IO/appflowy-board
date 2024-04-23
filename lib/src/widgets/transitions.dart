@@ -28,7 +28,8 @@ class SizeTransitionWithIntrinsicSize extends SingleChildRenderObjectWidget {
 
   @override
   RenderSizeTransitionWithIntrinsicSize createRenderObject(
-      BuildContext context) {
+    BuildContext context,
+  ) {
     return RenderSizeTransitionWithIntrinsicSize(
       axis: axis,
       sizeFactor: sizeFactor,
@@ -36,8 +37,10 @@ class SizeTransitionWithIntrinsicSize extends SingleChildRenderObjectWidget {
   }
 
   @override
-  void updateRenderObject(BuildContext context,
-      RenderSizeTransitionWithIntrinsicSize renderObject) {
+  void updateRenderObject(
+    BuildContext context,
+    RenderSizeTransitionWithIntrinsicSize renderObject,
+  ) {
     renderObject
       ..axis = axis
       ..sizeFactor = sizeFactor;

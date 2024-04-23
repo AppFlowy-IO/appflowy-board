@@ -93,8 +93,11 @@ class AppFlowyBoardController extends ChangeNotifier
   ///
   /// If you don't want to notify the listener after inserting the new group, the
   /// [notify] should set to false. Default value is true.
-  void insertGroup(int index, AppFlowyGroupData groupData,
-      {bool notify = true}) {
+  void insertGroup(
+    int index,
+    AppFlowyGroupData groupData, {
+    bool notify = true,
+  }) {
     if (_groupControllers[groupData.id] != null) return;
 
     final controller = AppFlowyGroupController(groupData: groupData);
@@ -123,7 +126,8 @@ class AppFlowyBoardController extends ChangeNotifier
     final index = _groupDatas.indexWhere((group) => group.id == groupId);
     if (index == -1) {
       Log.warn(
-          'Try to remove Group:[$groupId] failed. Group:[$groupId] not exist');
+        'Try to remove Group:[$groupId] failed. Group:[$groupId] not exist',
+      );
     }
 
     if (index != -1) {
@@ -287,7 +291,8 @@ class AppFlowyBoardController extends ChangeNotifier
       groupController.removeAt(index);
 
       Log.debug(
-          '[$AppFlowyBoardController] Group:[$groupId] remove phantom, current count: ${groupController.items.length}');
+        '[$AppFlowyBoardController] Group:[$groupId] remove phantom, current count: ${groupController.items.length}',
+      );
     }
     return isExist;
   }
@@ -301,7 +306,8 @@ class AppFlowyBoardController extends ChangeNotifier
     if (index != -1) {
       if (index != newIndex) {
         Log.trace(
-            '[$BoardPhantomController] update $groupId:$index to $groupId:$newIndex');
+          '[$BoardPhantomController] update $groupId:$index to $groupId:$newIndex',
+        );
         final item = groupController.removeAt(index, notify: false);
         if (item != null) {
           groupController.insert(newIndex, item, notify: false);

@@ -218,7 +218,7 @@ class _AppFlowyBoardContentState extends State<_AppFlowyBoardContent> {
   void initState() {
     super.initState();
     _overlayEntry = BoardOverlayEntry(
-      builder: (BuildContext context) {
+      builder: (context) {
         return Stack(
           alignment: AlignmentDirectional.topStart,
           children: [

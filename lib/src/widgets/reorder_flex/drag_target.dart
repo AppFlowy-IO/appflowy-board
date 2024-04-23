@@ -25,11 +25,10 @@ abstract class ReorderFlexDraggableTargetBuilder {
   );
 }
 
-///
 typedef DragTargetWillAccepted<T extends DragTargetData> = bool Function(
-    T dragTargetData);
+  T dragTargetData,
+);
 
-///
 typedef DragTargetOnStarted = void Function(Widget, int, Size?);
 
 typedef DragTargetOnMove<T extends DragTargetData> = void Function(
@@ -37,9 +36,9 @@ typedef DragTargetOnMove<T extends DragTargetData> = void Function(
   Offset offset,
 );
 
-///
 typedef DragTargetOnEnded<T extends DragTargetData> = void Function(
-    T dragTargetData);
+  T dragTargetData,
+);
 
 /// [ReorderDragTarget] is a [DragTarget] that carries the index information of
 /// the child. You could check out this link for more information.
@@ -67,8 +66,6 @@ class ReorderDragTarget<T extends DragTargetData> extends StatefulWidget {
   final DragTargetWillAccepted<T> onWillAcceptWithDetails;
 
   /// Called when an acceptable piece of data was dropped over this drag target.
-  ///
-  /// Equivalent to [onAcceptWithDetails], but only includes the data.
   final void Function(T dragTargetData)? onAccceptWithDetails;
 
   /// Called when a given piece of data being dragged over this target leaves
@@ -121,7 +118,7 @@ class ReorderDragTarget<T extends DragTargetData> extends StatefulWidget {
 
 class _ReorderDragTargetState<T extends DragTargetData>
     extends State<ReorderDragTarget<T>> {
-  /// Returns the dragTarget's size
+  /// the dragTarget's size
   Size? _draggingFeedbackSize = Size.zero;
 
   @override
@@ -177,15 +174,17 @@ class _ReorderDragTargetState<T extends DragTargetData>
     List<T?> acceptedCandidates,
     List<dynamic> rejectedCandidates,
   ) {
-    Widget feedbackBuilder = Builder(builder: (BuildContext context) {
-      BoxConstraints contentSizeConstraints =
-          BoxConstraints.loose(_draggingFeedbackSize!);
-      return _buildDraggableFeedback(
-        context,
-        contentSizeConstraints,
-        widget.child,
-      );
-    });
+    Widget feedbackBuilder = Builder(
+      builder: (BuildContext context) {
+        BoxConstraints contentSizeConstraints =
+            BoxConstraints.loose(_draggingFeedbackSize!);
+        return _buildDraggableFeedback(
+          context,
+          contentSizeConstraints,
+          widget.child,
+        );
+      },
+    );
 
     final draggableWidget = widget.draggableTargetBuilder?.build(
       context,
@@ -321,17 +320,29 @@ class DragTargetAnimation {
     required void Function(AnimationStatus) entranceAnimateStatusChanged,
   }) {
     entranceController = AnimationController(
-        value: 1.0, vsync: vsync, duration: reorderAnimationDuration);
+      value: 1.0,
+      vsync: vsync,
+      duration: reorderAnimationDuration,
+    );
     entranceController.addStatusListener(entranceAnimateStatusChanged);
 
     phantomController = AnimationController(
-        value: 0, vsync: vsync, duration: reorderAnimationDuration);
+      value: 0,
+      vsync: vsync,
+      duration: reorderAnimationDuration,
+    );
 
     insertController = AnimationController(
-        value: 0.0, vsync: vsync, duration: const Duration(milliseconds: 100));
+      value: 0.0,
+      vsync: vsync,
+      duration: const Duration(milliseconds: 100),
+    );
 
     deleteController = AnimationController(
-        value: 0.0, vsync: vsync, duration: const Duration(milliseconds: 1));
+      value: 0.0,
+      vsync: vsync,
+      duration: const Duration(milliseconds: 1),
+    );
   }
 
   void startDragging() {

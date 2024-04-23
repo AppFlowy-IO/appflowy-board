@@ -161,12 +161,12 @@ class _AppFlowyBoardGroupState extends State<AppFlowyBoardGroup> {
             widget.phantomController.groupStartDragging(widget.groupId);
             widget.onDragStarted?.call(index);
           },
-          onReorder: ((fromIndex, toIndex) {
+          onReorder: (fromIndex, toIndex) {
             if (widget.phantomController.shouldReorder(widget.groupId)) {
               widget.onReorder(widget.groupId, fromIndex, toIndex);
               widget.phantomController.updateIndex(fromIndex, toIndex);
             }
-          }),
+          },
           onDragEnded: () {
             widget.phantomController.groupEndDragging(widget.groupId);
             widget.onDragEnded?.call(widget.groupId);

@@ -1,7 +1,7 @@
 import "package:flutter/material.dart";
 
 class Log {
-  static const enableLog = false;
+  static const enableLog = true;
 
   static void trace(String? message) {
     if (enableLog) {

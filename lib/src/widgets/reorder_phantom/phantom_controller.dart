@@ -262,7 +262,8 @@ class PhantomRecord {
     }
 
     Log.debug(
-        '[$PhantomRecord] Group:[$toGroupId] update position $toGroupIndex -> $index');
+      '[$PhantomRecord] Group:[$toGroupId] update position $toGroupIndex -> $index',
+    );
     toGroupIndex = index;
   }
 
