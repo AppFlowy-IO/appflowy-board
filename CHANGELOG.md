@@ -1,3 +1,15 @@
+# 0.1.2
+
+- chore: add 'required_trailing_commas' to analysis_options.yaml by @richardshiue in [#30](https://github.com/AppFlowy-IO/appflowy-board/pull/30)
+- chore: bring package up to date by @richardshiue in [#30](https://github.com/AppFlowy-IO/appflowy-board/pull/30)
+- fix: exception when running on the web by @dsyrstad in [#25](https://github.com/AppFlowy-IO/appflowy-board/pull/25)
+- feat: improve scroll threshold and expandDistance by @hyj1204 in [#23](https://github.com/AppFlowy-IO/appflowy-board/pull/23)
+- feat: expand scrolling view horizontally while moving card by @hyj1204 in [#23](https://github.com/AppFlowy-IO/appflowy-board/pull/23)
+- feat: mobile improvement by @hyj1204 in [#21](https://github.com/AppFlowy-IO/appflowy-board/pull/21)
+- feat: mobile improvement by @hyj1204 in [#21](https://github.com/AppFlowy-IO/appflowy-board/pull/21)
+- feat: allow inserting a new group at given index by @richardshiue in [#19](https://github.com/AppFlowy-IO/appflowy-board/pull/19)
+- chore: fix images from readme by @Xazin in []()
+
 # 0.1.1
 
 - fix: use maybeOf and enable macos by @Xazin in ([#16](https://github.com/AppFlowy-IO/appflowy-board/pull/16))
