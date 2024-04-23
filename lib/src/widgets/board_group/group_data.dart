@@ -55,7 +55,8 @@ class AppFlowyGroupController extends ChangeNotifier with EquatableMixin {
   AppFlowyGroupItem? removeAt(int index, {bool notify = true}) {
     if (groupData._items.length <= index) {
       Log.error(
-          'Fatal error, index is out of bounds. Index: $index,  len: ${groupData._items.length}');
+        'Fatal error, index is out of bounds. Index: $index,  len: ${groupData._items.length}',
+      );
       return null;
     }
 
@@ -85,7 +86,8 @@ class AppFlowyGroupController extends ChangeNotifier with EquatableMixin {
     assert(toIndex >= 0);
     if (groupData._items.length < fromIndex) {
       Log.error(
-          'Out of bounds error. index: $fromIndex should not greater than ${groupData._items.length}');
+        'Out of bounds error. index: $fromIndex should not greater than ${groupData._items.length}',
+      );
       return false;
     }
 
@@ -94,7 +96,8 @@ class AppFlowyGroupController extends ChangeNotifier with EquatableMixin {
     }
 
     Log.debug(
-        '[$AppFlowyGroupController] $groupData move item from $fromIndex to $toIndex');
+      '[$AppFlowyGroupController] $groupData move item from $fromIndex to $toIndex',
+    );
     final item = groupData._items.removeAt(fromIndex);
     groupData._items.insert(toIndex, item);
     _notify();
@@ -141,14 +144,16 @@ class AppFlowyGroupController extends ChangeNotifier with EquatableMixin {
     } else {
       if (index >= groupData._items.length) {
         Log.error(
-            '[$AppFlowyGroupController] unexpected items length, index should less than the count of the items. Index: $index, items count: ${items.length}');
+          '[$AppFlowyGroupController] unexpected items length, index should less than the count of the items. Index: $index, items count: ${items.length}',
+        );
         return;
       }
 
       final removedItem = groupData._items.removeAt(index);
       groupData._items.insert(index, newItem);
       Log.debug(
-          '[$AppFlowyGroupController] $groupData replace $removedItem with $newItem at $index');
+        '[$AppFlowyGroupController] $groupData replace $removedItem with $newItem at $index',
+      );
     }
 
     _notify();

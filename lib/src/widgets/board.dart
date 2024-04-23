@@ -218,7 +218,7 @@ class _AppFlowyBoardContentState extends State<_AppFlowyBoardContent> {
   void initState() {
     super.initState();
     _overlayEntry = BoardOverlayEntry(
-      builder: (BuildContext context) {
+      builder: (context) {
         return Stack(
           alignment: AlignmentDirectional.topStart,
           children: [
@@ -379,7 +379,7 @@ class AppFlowyGroupContext {
 }
 
 class AppFlowyBoardState extends DraggingStateStorage
-    with ReorderDragTargetKeys {
+    implements ReorderDragTargetKeys {
   final Map<String, DraggingState> groupDragStates = {};
   final Map<String, Map<String, GlobalObjectKey>> groupDragTargetKeys = {};
 

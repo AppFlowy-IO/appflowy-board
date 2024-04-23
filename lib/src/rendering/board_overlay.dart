@@ -72,8 +72,10 @@ class BoardOverlay extends StatefulWidget {
     this.initialEntries = const <BoardOverlayEntry>[],
   });
 
-  static BoardOverlayState of(BuildContext context,
-      {Widget? debugRequiredFor}) {
+  static BoardOverlayState of(
+    BuildContext context, {
+    Widget? debugRequiredFor,
+  }) {
     final BoardOverlayState? result =
         context.findAncestorStateOfType<BoardOverlayState>();
     assert(() {
@@ -114,7 +116,8 @@ class BoardOverlayState extends State<BoardOverlay>
   void insert(BoardOverlayEntry entry, {BoardOverlayEntry? above}) {
     assert(entry._overlay == null);
     assert(
-        above == null || (above._overlay == this && _entries.contains(above)));
+      above == null || (above._overlay == this && _entries.contains(above)),
+    );
     entry._overlay = this;
     setState(() {
       final int index =
@@ -127,10 +130,13 @@ class BoardOverlayState extends State<BoardOverlay>
   ///
   /// If [above] is non-null, the entries are inserted just above [above].
   /// Otherwise, the entries are inserted on top.
-  void insertAll(Iterable<BoardOverlayEntry> entries,
-      {BoardOverlayEntry? above}) {
+  void insertAll(
+    Iterable<BoardOverlayEntry> entries, {
+    BoardOverlayEntry? above,
+  }) {
     assert(
-        above == null || (above._overlay == this && _entries.contains(above)));
+      above == null || (above._overlay == this && _entries.contains(above)),
+    );
     if (entries.isEmpty) return;
     for (BoardOverlayEntry entry in entries) {
       assert(entry._overlay == null);
@@ -328,8 +334,11 @@ class _BoardStackElement extends RenderObjectElement {
     super.update(newWidget);
     assert(widget == newWidget);
     _onstage = updateChild(_onstage, widget.onstage, _onstageSlot);
-    _offstage = updateChildren(_offstage, widget.offstage,
-        forgottenChildren: _forgottenOffstageChildren);
+    _offstage = updateChildren(
+      _offstage,
+      widget.offstage,
+      forgottenChildren: _forgottenOffstageChildren,
+    );
     _forgottenOffstageChildren.clear();
   }
 }

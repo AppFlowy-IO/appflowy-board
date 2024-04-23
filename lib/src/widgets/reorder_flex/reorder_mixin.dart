@@ -31,7 +31,9 @@ mixin ReorderFlexMixin {
       BoxConstraints contentSizeConstraints =
           BoxConstraints.loose(draggingFeedbackSize);
       return ConstrainedBox(
-          constraints: contentSizeConstraints, child: transition);
+        constraints: contentSizeConstraints,
+        child: transition,
+      );
     }
   }
 
@@ -62,13 +64,17 @@ mixin ReorderFlexMixin {
       BoxConstraints contentSizeConstraints =
           BoxConstraints.loose(draggingFeedbackSize);
       return ConstrainedBox(
-          constraints: contentSizeConstraints, child: transition);
+        constraints: contentSizeConstraints,
+        child: transition,
+      );
     }
   }
 }
 
 Animation<double> withCurve(
-    AnimationController animationController, Cubic curve) {
+  AnimationController animationController,
+  Cubic curve,
+) {
   return CurvedAnimation(
     parent: animationController,
     curve: curve,

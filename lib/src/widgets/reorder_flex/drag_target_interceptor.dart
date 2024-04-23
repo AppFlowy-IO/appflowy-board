@@ -71,12 +71,13 @@ class OverlappingDragTargetInterceptor extends DragTargetInterceptor {
   }
 
   @override
-  bool onWillAccept(
-      {required BuildContext context,
-      required ReorderFlexState reorderFlexState,
-      required FlexDragTargetData dragTargetData,
-      required String dragTargetId,
-      required int dragTargetIndex}) {
+  bool onWillAccept({
+    required BuildContext context,
+    required ReorderFlexState reorderFlexState,
+    required FlexDragTargetData dragTargetData,
+    required String dragTargetId,
+    required int dragTargetIndex,
+  }) {
     if (dragTargetId == dragTargetData.reorderFlexId) {
       delegate.cancel();
     } else {
@@ -98,9 +99,13 @@ class OverlappingDragTargetInterceptor extends DragTargetInterceptor {
         final index = delegate.getInsertedIndex(dragTargetId);
         if (index != -1) {
           Log.trace(
-              '[$OverlappingDragTargetInterceptor] move to $dragTargetId at $index');
+            '[$OverlappingDragTargetInterceptor] move to $dragTargetId at $index',
+          );
           delegate.dragTargetDidMoveToReorderFlex(
-              dragTargetId, dragTargetData, index);
+            dragTargetId,
+            dragTargetData,
+            index,
+          );
 
           columnsState.reorderFlexActionMap[dragTargetId]
               ?.resetDragTargetIndex(index);
@@ -112,7 +117,7 @@ class OverlappingDragTargetInterceptor extends DragTargetInterceptor {
   }
 }
 
-mixin CrossReorderFlexDragTargetDelegate {
+abstract class CrossReorderFlexDragTargetDelegate {
   /// * [reorderFlexId] is the id that the [ReorderFlex] passed in.
   bool acceptNewDragTargetData(
     String reorderFlexId,
@@ -153,11 +158,13 @@ class CrossReorderFlexDragTargetInterceptor extends DragTargetInterceptor {
       /// it means the dragTarget is dragging on the top of its own list.
       /// Otherwise, it means the dargTarget was moved to another list.
       Log.trace(
-          "[$CrossReorderFlexDragTargetInterceptor] $reorderFlexId should accept ${dragTargetData.reorderFlexId} : ${reorderFlexId != dragTargetData.reorderFlexId}");
+        "[$CrossReorderFlexDragTargetInterceptor] $reorderFlexId should accept ${dragTargetData.reorderFlexId} : ${reorderFlexId != dragTargetData.reorderFlexId}",
+      );
       return reorderFlexId != dragTargetData.reorderFlexId;
     } else {
       Log.trace(
-          "[$CrossReorderFlexDragTargetInterceptor] not accept ${dragTargetData.reorderFlexId}");
+        "[$CrossReorderFlexDragTargetInterceptor] not accept ${dragTargetData.reorderFlexId}",
+      );
       return false;
     }
   }
@@ -165,13 +172,15 @@ class CrossReorderFlexDragTargetInterceptor extends DragTargetInterceptor {
   @override
   void onAccept(FlexDragTargetData dragTargetData) {
     Log.trace(
-        '[$CrossReorderFlexDragTargetInterceptor] Group:[$reorderFlexId] on onAccept');
+      '[$CrossReorderFlexDragTargetInterceptor] Group:[$reorderFlexId] on onAccept',
+    );
   }
 
   @override
   void onLeave(FlexDragTargetData dragTargetData) {
     Log.trace(
-        '[$CrossReorderFlexDragTargetInterceptor] Group:[$reorderFlexId] on leave');
+      '[$CrossReorderFlexDragTargetInterceptor] Group:[$reorderFlexId] on leave',
+    );
   }
 
   @override
@@ -189,7 +198,8 @@ class CrossReorderFlexDragTargetInterceptor extends DragTargetInterceptor {
     );
 
     Log.debug(
-        '[$CrossReorderFlexDragTargetInterceptor] isNewDragTarget: $isNewDragTarget, dargTargetIndex: $dragTargetIndex, reorderFlexId: $reorderFlexId');
+      '[$CrossReorderFlexDragTargetInterceptor] isNewDragTarget: $isNewDragTarget, dargTargetIndex: $dragTargetIndex, reorderFlexId: $reorderFlexId',
+    );
 
     if (isNewDragTarget == false) {
       delegate.updateDragTargetData(reorderFlexId, dragTargetIndex);
