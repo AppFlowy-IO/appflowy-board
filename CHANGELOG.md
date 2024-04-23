@@ -1,5 +1,6 @@
 # 0.1.2
 
+- chore: clean up code & add lints by @Xazin in [#30](https://github.com/AppFlowy-IO/appflowy-board/pull/33)
 - chore: add 'required_trailing_commas' to analysis_options.yaml by @richardshiue in [#30](https://github.com/AppFlowy-IO/appflowy-board/pull/30)
 - chore: bring package up to date by @richardshiue in [#30](https://github.com/AppFlowy-IO/appflowy-board/pull/30)
 - fix: exception when running on the web by @dsyrstad in [#25](https://github.com/AppFlowy-IO/appflowy-board/pull/25)
