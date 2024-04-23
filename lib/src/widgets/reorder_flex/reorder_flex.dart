@@ -1,14 +1,14 @@
 import 'dart:collection';
 import 'dart:math';
 
-import 'package:appflowy_board/appflowy_board.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+
 import '../../utils/log.dart';
-import 'reorder_mixin.dart';
-import 'drag_target.dart';
 import 'drag_state.dart';
+import 'drag_target.dart';
 import 'drag_target_interceptor.dart';
+import 'reorder_mixin.dart';
 
 typedef OnDragStarted = void Function(int index);
 typedef OnDragEnded = void Function();
@@ -18,7 +18,7 @@ typedef OnInserted = void Function(int insertedIndex);
 typedef OnReceivePassedInPhantom = void Function(
     FlexDragTargetData dragTargetData, int phantomIndex);
 
-abstract class ReoderFlexDataSource {
+mixin ReoderFlexDataSource {
   /// [identifier] represents the id the [ReorderFlex]. It must be unique.
   String get identifier;
 
@@ -31,14 +31,14 @@ abstract class ReoderFlexItem {
   /// [id] is used to identify the item. It must be unique.
   String get id;
 
-  IsDraggable draggable = true;
+  bool draggable = true;
 }
 
 /// Cache each dragTarget's key.
 /// For the moment, the key is used to locate the render object that will
 /// be passed in the [ScrollPosition]'s [ensureVisible] function.
 ///
-abstract class ReorderDragTargeKeys {
+mixin ReorderDragTargetKeys {
   void insertDragTarget(
     String reorderFlexId,
     String key,
@@ -114,7 +114,7 @@ class ReorderFlex extends StatefulWidget {
   /// Save the [DraggingState] if the current [ReorderFlex] get reinitialize.
   final DraggingStateStorage? dragStateStorage;
 
-  final ReorderDragTargeKeys? dragTargetKeys;
+  final ReorderDragTargetKeys? dragTargetKeys;
 
   final ReorderFlexAction? reorderFlexAction;
 
@@ -280,7 +280,7 @@ class ReorderFlexState extends State<ReorderFlex>
     Widget child,
     int childIndex,
     GlobalObjectKey indexKey,
-    IsDraggable draggable,
+    bool draggable,
   ) {
     return Builder(builder: (context) {
       final ReorderDragTarget dragTarget = _buildDragTarget(
@@ -296,8 +296,8 @@ class ReorderFlexState extends State<ReorderFlex>
         shiftedIndex = draggingState.calculateShiftedIndex(childIndex);
       }
 
-      Log.trace(
-          'Rebuild: Group:[${draggingState.reorderFlexId}] ${draggingState.toString()}, childIndex: $childIndex shiftedIndex: $shiftedIndex');
+      // Log.trace(
+      // 'Rebuild: Group:[${draggingState.reorderFlexId}] ${draggingState.toString()}, childIndex: $childIndex shiftedIndex: $shiftedIndex');
       final currentIndex = draggingState.currentIndex;
       final dragPhantomIndex = draggingState.phantomIndex;
 
@@ -407,7 +407,7 @@ class ReorderFlexState extends State<ReorderFlex>
     Widget child,
     int dragTargetIndex,
     GlobalObjectKey indexKey,
-    IsDraggable draggable,
+    bool draggable,
   ) {
     final reorderFlexItem = widget.dataSource.items[dragTargetIndex];
     return ReorderDragTarget<FlexDragTargetData>(
@@ -425,7 +425,7 @@ class ReorderFlexState extends State<ReorderFlex>
       groupWidth: widget.groupWidth,
       onDragStarted: (draggingWidget, draggingIndex, size) {
         Log.debug(
-            "[DragTarget] Group:[${widget.dataSource.identifier}] start dragging item at $draggingIndex");
+            "[DragTarget] Group \"${widget.dataSource.identifier}\" start dragging item at index $draggingIndex");
         _startDragging(draggingWidget, draggingIndex, size);
         widget.onDragStarted?.call(draggingIndex);
         widget.dragStateStorage?.removeState(widget.reorderFlexId);
@@ -436,11 +436,11 @@ class ReorderFlexState extends State<ReorderFlex>
       onDragEnded: (dragTargetData) {
         if (!mounted) {
           Log.warn(
-              "[DragTarget]: Group:[${widget.dataSource.identifier}] end dragging but current widget was unmounted");
+              "[DragTarget] Group \"${widget.dataSource.identifier}\" end dragging but current widget was unmounted");
           return;
         }
         Log.debug(
-            "[DragTarget]: Group:[${widget.dataSource.identifier}] end dragging");
+            "[DragTarget] Group \"${widget.dataSource.identifier}\" end dragging");
 
         _notifier.updateDragTargetIndex(-1);
         _animation.insertController.stop();
@@ -456,7 +456,7 @@ class ReorderFlexState extends State<ReorderFlex>
           widget.onDragEnded?.call();
         });
       },
-      onWillAccept: (FlexDragTargetData dragTargetData) {
+      onWillAcceptWithDetails: (FlexDragTargetData dragTargetData) {
         // Do not receive any events if the Insert item is animating.
         if (_animation.insertController.isAnimating) {
           return false;
@@ -481,7 +481,7 @@ class ReorderFlexState extends State<ReorderFlex>
           return false;
         }
       },
-      onAccept: (dragTargetData) {
+      onAccceptWithDetails: (dragTargetData) {
         _interceptDragTarget(
           dragTargetData,
           (interceptor) => interceptor.onAccept(dragTargetData),
@@ -601,9 +601,8 @@ class ReorderFlexState extends State<ReorderFlex>
     if (PrimaryScrollController.maybeOf(context) == null) {
       return child;
     } else {
-      return Scrollbar(
-        controller: _scrollController,
-        thumbVisibility: true,
+      return ScrollConfiguration(
+        behavior: ScrollConfiguration.of(context).copyWith(scrollbars: true),
         child: SingleChildScrollView(
           scrollDirection: widget.config.direction,
           controller: _scrollController,
@@ -626,7 +625,6 @@ class ReorderFlexState extends State<ReorderFlex>
           ],
         );
       case Axis.vertical:
-      default:
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: widget.mainAxisAlignment,
@@ -648,7 +646,6 @@ class ReorderFlexState extends State<ReorderFlex>
           children: children,
         );
       case Axis.vertical:
-      default:
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: widget.mainAxisAlignment,

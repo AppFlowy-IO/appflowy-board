@@ -64,12 +64,12 @@ class ReorderDragTarget<T extends DragTargetData> extends StatefulWidget {
   ///
   /// [toAccept] represents the dragTarget index, which is the value passed in
   /// when creating the [ReorderDragTarget].
-  final DragTargetWillAccepted<T> onWillAccept;
+  final DragTargetWillAccepted<T> onWillAcceptWithDetails;
 
   /// Called when an acceptable piece of data was dropped over this drag target.
   ///
   /// Equivalent to [onAcceptWithDetails], but only includes the data.
-  final void Function(T dragTargetData)? onAccept;
+  final void Function(T dragTargetData)? onAccceptWithDetails;
 
   /// Called when a given piece of data being dragged over this target leaves
   /// the target.
@@ -94,26 +94,26 @@ class ReorderDragTarget<T extends DragTargetData> extends StatefulWidget {
   final double groupWidth;
 
   const ReorderDragTarget({
-    Key? key,
+    super.key,
     required this.child,
     required this.indexGlobalKey,
     required this.dragTargetData,
     required this.onDragStarted,
     required this.onDragMoved,
     required this.onDragEnded,
-    required this.onWillAccept,
+    required this.onWillAcceptWithDetails,
     required this.insertAnimationController,
     required this.deleteAnimationController,
     required this.useMoveAnimation,
     required this.draggable,
     required this.scrollController,
     required this.groupWidth,
-    this.onAccept,
+    this.onAccceptWithDetails,
     this.onLeave,
     this.draggableTargetBuilder,
     this.draggingOpacity = 0.3,
     this.dragDirection,
-  }) : super(key: key);
+  });
 
   @override
   State<ReorderDragTarget<T>> createState() => _ReorderDragTargetState<T>();
@@ -128,14 +128,12 @@ class _ReorderDragTargetState<T extends DragTargetData>
   Widget build(BuildContext context) {
     Widget dragTarget = DragTarget<T>(
       builder: _buildDraggableWidget,
-      onWillAccept: (dragTargetData) {
-        if (dragTargetData == null) {
-          return false;
-        }
-
-        return widget.onWillAccept(dragTargetData);
+      onWillAcceptWithDetails: (details) {
+        return widget.onWillAcceptWithDetails(details.data);
       },
-      onAccept: widget.onAccept,
+      onAcceptWithDetails: (details) {
+        widget.onAccceptWithDetails?.call(details.data);
+      },
       onMove: (detail) {
         // Expand the scroll view horizontally when the dragging is near the edge of the scroll view.
         // It is used to move card to the other group.
@@ -194,7 +192,7 @@ class _ReorderDragTargetState<T extends DragTargetData>
       widget.child,
       widget.onDragStarted,
       widget.onDragEnded,
-      widget.onWillAccept,
+      widget.onWillAcceptWithDetails,
       widget.insertAnimationController,
       widget.deleteAnimationController,
     );
@@ -364,11 +362,11 @@ class IgnorePointerWidget extends StatelessWidget {
   final double opacity;
 
   const IgnorePointerWidget({
+    super.key,
     required this.child,
     required this.opacity,
     this.useIntrinsicSize = false,
-    Key? key,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -391,11 +389,11 @@ class AbsorbPointerWidget extends StatelessWidget {
   final bool useIntrinsicSize;
   final double opacity;
   const AbsorbPointerWidget({
+    super.key,
     required this.child,
     required this.opacity,
     this.useIntrinsicSize = false,
-    Key? key,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -416,10 +414,10 @@ class PhantomWidget extends StatelessWidget {
   final Widget? child;
   final double opacity;
   const PhantomWidget({
+    super.key,
     this.child,
     this.opacity = 1.0,
-    Key? key,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -447,13 +445,13 @@ class DragTargeMovePlaceholder extends StatefulWidget {
   final DragTargetMovePlaceholderDelegate delegate;
 
   const DragTargeMovePlaceholder({
+    super.key,
     required this.delegate,
     required this.dragTargetIndex,
     this.height = 4,
     this.color = Colors.transparent,
     this.highlightColor = Colors.lightBlue,
-    Key? key,
-  }) : super(key: key);
+  });
 
   @override
   State<DragTargeMovePlaceholder> createState() =>
@@ -511,7 +509,7 @@ abstract class FakeDragTargetEventTrigger {
   void fakeOnDragEnded(VoidCallback callback);
 }
 
-abstract class FakeDragTargetEventData {
+mixin FakeDragTargetEventData {
   Size? get feedbackSize;
   int get index;
   DragTargetData get dragTargetData;
@@ -527,7 +525,7 @@ class FakeDragTarget<T extends DragTargetData> extends StatefulWidget {
   final AnimationController insertAnimationController;
   final AnimationController deleteAnimationController;
   const FakeDragTarget({
-    Key? key,
+    super.key,
     required this.eventTrigger,
     required this.eventData,
     required this.onDragStarted,
@@ -536,7 +534,7 @@ class FakeDragTarget<T extends DragTargetData> extends StatefulWidget {
     required this.insertAnimationController,
     required this.deleteAnimationController,
     required this.child,
-  }) : super(key: key);
+  });
 
   @override
   State<FakeDragTarget<T>> createState() => _FakeDragTargetState<T>();

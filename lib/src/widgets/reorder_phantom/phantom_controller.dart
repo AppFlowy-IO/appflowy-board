@@ -7,7 +7,7 @@ import '../reorder_flex/drag_target.dart';
 import '../reorder_flex/drag_target_interceptor.dart';
 import 'phantom_state.dart';
 
-abstract class BoardPhantomControllerDelegate {
+mixin BoardPhantomControllerDelegate {
   AppFlowyGroupController? controller(String groupId);
 
   bool removePhantom(String groupId);
@@ -338,14 +338,10 @@ class PassthroughPhantomWidget extends PhantomWidget {
   final PassthroughPhantomContext passthroughPhantomContext;
 
   PassthroughPhantomWidget({
-    required double opacity,
+    super.key,
+    required super.opacity,
     required this.passthroughPhantomContext,
-    Key? key,
-  }) : super(
-          child: passthroughPhantomContext.draggingWidget,
-          opacity: opacity,
-          key: key,
-        );
+  }) : super(child: passthroughPhantomContext.draggingWidget);
 }
 
 class PhantomDraggableBuilder extends ReorderFlexDraggableTargetBuilder {

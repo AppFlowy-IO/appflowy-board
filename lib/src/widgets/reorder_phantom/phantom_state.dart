@@ -51,7 +51,7 @@ class GroupState {
   }
 }
 
-abstract class PassthroughPhantomListener {
+mixin PassthroughPhantomListener {
   void Function(int?)? get onInserted;
   VoidCallback? get onDragEnded;
 }
