@@ -1,5 +1,5 @@
-import 'package:flutter/widgets.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 
 class SizeTransitionWithIntrinsicSize extends SingleChildRenderObjectWidget {
   /// Creates a size transition with its intrinsic width/height taking [sizeFactor]
@@ -56,20 +56,20 @@ class SizeTransitionWithIntrinsicSize extends SingleChildRenderObjectWidget {
 }
 
 class RenderSizeTransitionWithIntrinsicSize extends RenderProxyBox {
-  Axis axis;
-  Animation<double> sizeFactor;
-
   RenderSizeTransitionWithIntrinsicSize({
-    this.axis = Axis.vertical,
     required this.sizeFactor,
+    this.axis = Axis.vertical,
     RenderBox? child,
   }) : super(child);
+
+  Animation<double> sizeFactor;
+  Axis axis;
 
   @override
   double computeMinIntrinsicWidth(double height) {
     final child = this.child;
     if (child != null) {
-      double childWidth = child.getMinIntrinsicWidth(height);
+      final childWidth = child.getMinIntrinsicWidth(height);
       return axis == Axis.horizontal
           ? childWidth * sizeFactor.value
           : childWidth;
@@ -81,7 +81,7 @@ class RenderSizeTransitionWithIntrinsicSize extends RenderProxyBox {
   double computeMaxIntrinsicWidth(double height) {
     final child = this.child;
     if (child != null) {
-      double childWidth = child.getMaxIntrinsicWidth(height);
+      final childWidth = child.getMaxIntrinsicWidth(height);
       return axis == Axis.horizontal
           ? childWidth * sizeFactor.value
           : childWidth;
@@ -93,7 +93,7 @@ class RenderSizeTransitionWithIntrinsicSize extends RenderProxyBox {
   double computeMinIntrinsicHeight(double width) {
     final child = this.child;
     if (child != null) {
-      double childHeight = child.getMinIntrinsicHeight(width);
+      final childHeight = child.getMinIntrinsicHeight(width);
       return axis == Axis.vertical
           ? childHeight * sizeFactor.value
           : childHeight;
@@ -105,7 +105,7 @@ class RenderSizeTransitionWithIntrinsicSize extends RenderProxyBox {
   double computeMaxIntrinsicHeight(double width) {
     final child = this.child;
     if (child != null) {
-      double childHeight = child.getMaxIntrinsicHeight(width);
+      final childHeight = child.getMaxIntrinsicHeight(width);
       return axis == Axis.vertical
           ? childHeight * sizeFactor.value
           : childHeight;

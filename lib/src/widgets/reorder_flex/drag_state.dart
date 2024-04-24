@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../utils/log.dart';
+
 import 'drag_target.dart';
 import 'reorder_flex.dart';
 
@@ -12,28 +13,6 @@ import 'reorder_flex.dart';
 /// * [reorderFlexItem] the item of the [ReorderFlex]
 ///
 class FlexDragTargetData extends DragTargetData {
-  /// The index of the dragging target in the boardList.
-  @override
-  final int draggingIndex;
-
-  final DraggingState _draggingState;
-
-  Widget? get draggingWidget => _draggingState.draggingWidget;
-
-  Size? get feedbackSize => _draggingState.feedbackSize;
-
-  bool get isDragging => _draggingState.isDragging();
-
-  final String dragTargetId;
-
-  Offset dragTargetOffset = Offset.zero;
-
-  final GlobalObjectKey dragTargetIndexKey;
-
-  final String reorderFlexId;
-
-  final ReoderFlexItem reorderFlexItem;
-
   FlexDragTargetData({
     required this.dragTargetId,
     required this.draggingIndex,
@@ -43,10 +22,26 @@ class FlexDragTargetData extends DragTargetData {
     required DraggingState draggingState,
   }) : _draggingState = draggingState;
 
+  final String dragTargetId;
+
+  /// The index of the dragging target in the boardList.
   @override
-  String toString() {
-    return 'ReorderFlexId: $reorderFlexId, dragTargetId: $dragTargetId';
-  }
+  final int draggingIndex;
+
+  final String reorderFlexId;
+  final ReoderFlexItem reorderFlexItem;
+  final GlobalObjectKey dragTargetIndexKey;
+  final DraggingState _draggingState;
+
+  Offset dragTargetOffset = Offset.zero;
+
+  Widget? get draggingWidget => _draggingState.draggingWidget;
+  Size? get feedbackSize => _draggingState.feedbackSize;
+  bool get isDragging => _draggingState.isDragging();
+
+  @override
+  String toString() =>
+      'ReorderFlexId: $reorderFlexId, dragTargetId: $dragTargetId';
 
   bool isOverlapWithWidgets(List<GlobalObjectKey> widgetKeys) {
     final renderBox = dragTargetIndexKey.currentContext?.findRenderObject();
@@ -58,7 +53,7 @@ class FlexDragTargetData extends DragTargetData {
     for (final widgetKey in widgetKeys) {
       final renderObject = widgetKey.currentContext?.findRenderObject();
       if (renderObject != null && renderObject is RenderBox) {
-        Rect widgetRect =
+        final Rect widgetRect =
             renderObject.localToGlobal(Offset.zero) & renderObject.size;
         return dragTargetRect.overlaps(widgetRect);
       }
@@ -75,6 +70,8 @@ abstract class DraggingStateStorage {
 }
 
 class DraggingState {
+  DraggingState(this.reorderFlexId);
+
   final String reorderFlexId;
 
   /// The member of widget.children currently being dragged.
@@ -103,8 +100,6 @@ class DraggingState {
 
   /// The additional margin to place around a computed drop area.
   static const double _dropAreaMargin = 0.0;
-
-  DraggingState(this.reorderFlexId);
 
   Size get dropAreaSize {
     if (feedbackSize == null) {
@@ -138,26 +133,16 @@ class DraggingState {
 
   /// When the phantomIndex and currentIndex are the same, it means the dragging
   /// widget did move to the destination location.
-  void removePhantom() {
-    phantomIndex = currentIndex;
-  }
+  void removePhantom() => phantomIndex = currentIndex;
 
   /// The dragging widget overlaps with the phantom widget.
-  bool isOverlapWithPhantom() {
-    return currentIndex != phantomIndex;
-  }
+  bool isOverlapWithPhantom() => currentIndex != phantomIndex;
 
-  bool isPhantomAboveDragTarget() {
-    return currentIndex > phantomIndex;
-  }
+  bool isPhantomAboveDragTarget() => currentIndex > phantomIndex;
 
-  bool isPhantomBelowDragTarget() {
-    return currentIndex < phantomIndex;
-  }
+  bool isPhantomBelowDragTarget() => currentIndex < phantomIndex;
 
-  bool didDragTargetMoveToNext() {
-    return currentIndex == nextIndex;
-  }
+  bool didDragTargetMoveToNext() => currentIndex == nextIndex;
 
   /// Set the currentIndex to nextIndex
   void moveDragTargetToNext() {
@@ -178,19 +163,13 @@ class DraggingState {
     nextIndex = index;
   }
 
-  bool isNotDragging() {
-    return dragStartIndex == -1;
-  }
+  bool isNotDragging() => dragStartIndex == -1;
 
-  bool isDragging() {
-    return !isNotDragging();
-  }
+  bool isDragging() => !isNotDragging();
 
   /// When the _dragStartIndex less than the _currentIndex, it means the
   /// dragTarget is going down to the end of the list.
-  bool isDragTargetMovingDown() {
-    return dragStartIndex < currentIndex;
-  }
+  bool isDragTargetMovingDown() => dragStartIndex < currentIndex;
 
   /// The index represents the widget original index of the list.
   int calculateShiftedIndex(int index) {
@@ -208,7 +187,6 @@ class DraggingState {
   }
 
   @override
-  String toString() {
-    return 'DragStartIndex: $dragStartIndex, PhantomIndex: $phantomIndex, CurrentIndex: $currentIndex, NextIndex: $nextIndex';
-  }
+  String toString() =>
+      'DragStartIndex: $dragStartIndex, PhantomIndex: $phantomIndex, CurrentIndex: $currentIndex, NextIndex: $nextIndex';
 }

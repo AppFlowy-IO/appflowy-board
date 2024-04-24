@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
 
 class AppFlowyGroupCard extends StatelessWidget {
-  final Widget? child;
-  final EdgeInsets margin;
-  final BoxConstraints boxConstraints;
-  final BoxDecoration decoration;
-
   const AppFlowyGroupCard({
     super.key,
     this.child,
@@ -16,6 +11,11 @@ class AppFlowyGroupCard extends StatelessWidget {
     ),
     this.boxConstraints = const BoxConstraints(minHeight: 40),
   });
+
+  final Widget? child;
+  final EdgeInsets margin;
+  final BoxDecoration decoration;
+  final BoxConstraints boxConstraints;
 
   @override
   Widget build(BuildContext context) {

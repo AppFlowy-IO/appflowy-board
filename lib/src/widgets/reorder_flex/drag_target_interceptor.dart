@@ -1,8 +1,11 @@
 import 'dart:async';
 
-import 'package:appflowy_board/src/widgets/board.dart';
 import 'package:flutter/material.dart';
+
+import 'package:appflowy_board/src/widgets/board.dart';
+
 import '../../utils/log.dart';
+
 import 'drag_state.dart';
 import 'drag_target.dart';
 import 'reorder_flex.dart';
@@ -51,19 +54,22 @@ abstract class OverlapDragTargetDelegate {
 /// Receive the [DragTarget] event if the [acceptedReorderFlexId] contains
 /// the passed in dragTarget' reorderFlexId.
 class OverlappingDragTargetInterceptor extends DragTargetInterceptor {
-  @override
-  final String reorderFlexId;
-  final List<String> acceptedReorderFlexId;
-  final OverlapDragTargetDelegate delegate;
-  final AppFlowyBoardState columnsState;
-  Timer? _delayOperation;
-
   OverlappingDragTargetInterceptor({
     required this.delegate,
     required this.reorderFlexId,
     required this.acceptedReorderFlexId,
     required this.columnsState,
   });
+
+  final OverlapDragTargetDelegate delegate;
+
+  @override
+  final String reorderFlexId;
+
+  final List<String> acceptedReorderFlexId;
+  final AppFlowyBoardState columnsState;
+
+  Timer? _delayOperation;
 
   @override
   bool canHandler(FlexDragTargetData dragTargetData) {
@@ -125,27 +131,24 @@ abstract class CrossReorderFlexDragTargetDelegate {
     int dragTargetIndex,
   );
 
-  void updateDragTargetData(
-    String reorderFlexId,
-    int dragTargetIndex,
-  );
+  void updateDragTargetData(String reorderFlexId, int dragTargetIndex);
 }
 
 class CrossReorderFlexDragTargetInterceptor extends DragTargetInterceptor {
-  @override
-  final String reorderFlexId;
-  final List<String> acceptedReorderFlexIds;
-  final CrossReorderFlexDragTargetDelegate delegate;
-
-  @override
-  final ReorderFlexDraggableTargetBuilder? draggableTargetBuilder;
-
   CrossReorderFlexDragTargetInterceptor({
     required this.reorderFlexId,
     required this.delegate,
     required this.acceptedReorderFlexIds,
     this.draggableTargetBuilder,
   });
+
+  @override
+  final String reorderFlexId;
+  final CrossReorderFlexDragTargetDelegate delegate;
+  final List<String> acceptedReorderFlexIds;
+
+  @override
+  final ReorderFlexDraggableTargetBuilder? draggableTargetBuilder;
 
   @override
   bool canHandler(FlexDragTargetData dragTargetData) {

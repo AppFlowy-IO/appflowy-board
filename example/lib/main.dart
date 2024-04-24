@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'single_board_list_example.dart';
+
 import 'multi_board_list_example.dart';
+import 'single_board_list_example.dart';
 
 void main() {
   runApp(const MyApp());
@@ -21,11 +22,6 @@ class _MyAppState extends State<MyApp> {
     const MultiBoardListExample(),
     const SingleBoardListExample(),
   ];
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {

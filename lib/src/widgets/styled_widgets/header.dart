@@ -4,15 +4,6 @@ typedef OnHeaderAddButtonClick = void Function();
 typedef OnHeaderMoreButtonClick = void Function();
 
 class AppFlowyGroupHeader extends StatelessWidget {
-  final double? height;
-  final Widget? icon;
-  final Widget? title;
-  final Widget? addIcon;
-  final Widget? moreIcon;
-  final EdgeInsets margin;
-  final OnHeaderAddButtonClick? onAddButtonClick;
-  final OnHeaderMoreButtonClick? onMoreButtonClick;
-
   const AppFlowyGroupHeader({
     super.key,
     this.height,
@@ -24,6 +15,15 @@ class AppFlowyGroupHeader extends StatelessWidget {
     this.onAddButtonClick,
     this.onMoreButtonClick,
   });
+
+  final double? height;
+  final Widget? icon;
+  final Widget? title;
+  final Widget? addIcon;
+  final Widget? moreIcon;
+  final EdgeInsets margin;
+  final OnHeaderAddButtonClick? onAddButtonClick;
+  final OnHeaderMoreButtonClick? onMoreButtonClick;
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +66,5 @@ class AppFlowyGroupHeader extends StatelessWidget {
     );
   }
 
-  Widget _hSpace() {
-    return const SizedBox(width: 6);
-  }
+  Widget _hSpace() => const SizedBox(width: 6);
 }

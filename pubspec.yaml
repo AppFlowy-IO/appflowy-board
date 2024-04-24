@@ -6,7 +6,7 @@ homepage: https://github.com/AppFlowy-IO/appflowy-board
 repository: https://github.com/AppFlowy-IO/appflowy-board
 
 environment:
-  sdk: '>=3.3.0 <4.0.0'
+  sdk: ">=3.3.0 <4.0.0"
   flutter: ">=3.19.0"
 
 dependencies:

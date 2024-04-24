@@ -1,9 +1,11 @@
 import 'dart:collection';
 
+import 'package:flutter/material.dart';
+
+import 'package:equatable/equatable.dart';
+
 import 'package:appflowy_board/src/utils/log.dart';
 import 'package:appflowy_board/src/widgets/reorder_flex/reorder_flex.dart';
-import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
 
 typedef IsDraggable = bool;
 
@@ -27,11 +29,9 @@ abstract class AppFlowyGroupItem extends ReoderFlexItem {
 /// All there operations will notify listeners by default.
 ///
 class AppFlowyGroupController extends ChangeNotifier with EquatableMixin {
-  final AppFlowyGroupData groupData;
+  AppFlowyGroupController({required this.groupData});
 
-  AppFlowyGroupController({
-    required this.groupData,
-  });
+  final AppFlowyGroupData groupData;
 
   @override
   List<Object?> get props => groupData.props;
@@ -179,7 +179,7 @@ class AppFlowyGroupController extends ChangeNotifier with EquatableMixin {
   void enableDragging(bool isEnable) {
     groupData.draggable = isEnable;
 
-    for (var item in groupData._items) {
+    for (final item in groupData._items) {
       item.draggable = isEnable;
     }
     _notify();
@@ -192,22 +192,23 @@ class AppFlowyGroupController extends ChangeNotifier with EquatableMixin {
 
 /// [AppFlowyGroupData] represents the data of each group of the Board.
 class AppFlowyGroupData<CustomData> extends ReoderFlexItem with EquatableMixin {
-  @override
-  final String id;
-  AppFlowyGroupHeaderData headerData;
-  final List<AppFlowyGroupItem> _items;
-  final CustomData? customData;
-
   AppFlowyGroupData({
-    this.customData,
     required this.id,
     required String name,
+    this.customData,
     List<AppFlowyGroupItem> items = const [],
   })  : _items = items,
         headerData = AppFlowyGroupHeaderData(
           groupId: id,
           groupName: name,
         );
+
+  @override
+  final String id;
+  AppFlowyGroupHeaderData headerData;
+  final CustomData? customData;
+
+  final List<AppFlowyGroupItem> _items;
 
   /// Returns the readonly List<AppFlowyGroupItem>
   UnmodifiableListView<AppFlowyGroupItem> get items =>
@@ -217,14 +218,15 @@ class AppFlowyGroupData<CustomData> extends ReoderFlexItem with EquatableMixin {
   List<Object?> get props => [id, ..._items];
 
   @override
-  String toString() {
-    return 'Group:[$id]';
-  }
+  String toString() => 'Group:[$id]';
 }
 
 class AppFlowyGroupHeaderData {
+  AppFlowyGroupHeaderData({
+    required this.groupId,
+    required this.groupName,
+  });
+
   String groupId;
   String groupName;
-
-  AppFlowyGroupHeaderData({required this.groupId, required this.groupName});
 }

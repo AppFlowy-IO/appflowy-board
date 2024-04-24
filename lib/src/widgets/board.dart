@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+
 import 'package:provider/provider.dart';
 
+import '../rendering/board_overlay.dart';
 import '../utils/log.dart';
+
 import 'board_data.dart';
 import 'board_group/group.dart';
 import 'board_group/group_data.dart';
@@ -9,7 +12,6 @@ import 'reorder_flex/drag_state.dart';
 import 'reorder_flex/drag_target_interceptor.dart';
 import 'reorder_flex/reorder_flex.dart';
 import 'reorder_phantom/phantom_controller.dart';
-import '../rendering/board_overlay.dart';
 
 class AppFlowyBoardScrollController {
   AppFlowyBoardState? _boardState;
@@ -23,21 +25,6 @@ class AppFlowyBoardScrollController {
 }
 
 class AppFlowyBoardConfig {
-  // board
-  final double boardCornerRadius;
-
-  // group
-  final Color groupBackgroundColor;
-  final double groupCornerRadius;
-  final EdgeInsets groupMargin;
-  final EdgeInsets groupHeaderPadding;
-  final EdgeInsets groupBodyPadding;
-  final EdgeInsets groupFooterPadding;
-  final bool stretchGroupHeight;
-
-  // card
-  final EdgeInsets cardMargin;
-
   const AppFlowyBoardConfig({
     this.boardCornerRadius = 6.0,
     this.groupCornerRadius = 6.0,
@@ -49,9 +36,52 @@ class AppFlowyBoardConfig {
     this.stretchGroupHeight = true,
     this.cardMargin = const EdgeInsets.symmetric(horizontal: 3, vertical: 4),
   });
+
+  // board
+  final double boardCornerRadius;
+
+  // group
+  final double groupCornerRadius;
+  final Color groupBackgroundColor;
+  final EdgeInsets groupMargin;
+  final EdgeInsets groupHeaderPadding;
+  final EdgeInsets groupBodyPadding;
+  final EdgeInsets groupFooterPadding;
+  final bool stretchGroupHeight;
+
+  // card
+  final EdgeInsets cardMargin;
 }
 
 class AppFlowyBoard extends StatelessWidget {
+  const AppFlowyBoard({
+    super.key,
+    required this.controller,
+    required this.cardBuilder,
+    this.headerBuilder,
+    this.footerBuilder,
+    this.background,
+    this.groupConstraints = const BoxConstraints(maxWidth: 200),
+    this.scrollController,
+    this.config = const AppFlowyBoardConfig(),
+    this.boardScrollController,
+    this.leading,
+    this.trailing,
+  });
+
+  /// A controller for [AppFlowyBoard] widget.
+  ///
+  /// A [AppFlowyBoardController] can be used to provide an initial value of
+  /// the board by calling `addGroup` method with the passed in parameter
+  /// [AppFlowyGroupData]. A [AppFlowyGroupData] represents one
+  /// group data. Whenever the user modifies the board, this controller will
+  /// update the corresponding group data.
+  ///
+  /// Also, you can register the callbacks that receive the changes. Check out
+  /// the [AppFlowyBoardController] for more information.
+  ///
+  final AppFlowyBoardController controller;
+
   /// The widget that will be rendered as the background of the board.
   final Widget? background;
 
@@ -73,19 +103,6 @@ class AppFlowyBoard extends StatelessWidget {
   ///
   /// must return a widget.
   final AppFlowyBoardFooterBuilder? footerBuilder;
-
-  /// A controller for [AppFlowyBoard] widget.
-  ///
-  /// A [AppFlowyBoardController] can be used to provide an initial value of
-  /// the board by calling `addGroup` method with the passed in parameter
-  /// [AppFlowyGroupData]. A [AppFlowyGroupData] represents one
-  /// group data. Whenever the user modifies the board, this controller will
-  /// update the corresponding group data.
-  ///
-  /// Also, you can register the callbacks that receive the changes. Check out
-  /// the [AppFlowyBoardController] for more information.
-  ///
-  final AppFlowyBoardController controller;
 
   /// A constraints applied to [AppFlowyBoardGroup] widget.
   final BoxConstraints groupConstraints;
@@ -112,21 +129,6 @@ class AppFlowyBoard extends StatelessWidget {
   ///
   final Widget? trailing;
 
-  const AppFlowyBoard({
-    super.key,
-    required this.controller,
-    required this.cardBuilder,
-    this.background,
-    this.footerBuilder,
-    this.headerBuilder,
-    this.scrollController,
-    this.boardScrollController,
-    this.groupConstraints = const BoxConstraints(maxWidth: 200),
-    this.config = const AppFlowyBoardConfig(),
-    this.leading,
-    this.trailing,
-  });
-
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.value(
@@ -134,7 +136,7 @@ class AppFlowyBoard extends StatelessWidget {
       child: Consumer<AppFlowyBoardController>(
         builder: (context, notifier, child) {
           final boardState = AppFlowyBoardState();
-          BoardPhantomController phantomController = BoardPhantomController(
+          final phantomController = BoardPhantomController(
             delegate: controller,
             groupsState: boardState,
           );
@@ -167,23 +169,6 @@ class AppFlowyBoard extends StatelessWidget {
 }
 
 class _AppFlowyBoardContent extends StatefulWidget {
-  final AppFlowyBoardConfig config;
-  final OnReorder onReorder;
-  final OverlapDragTargetDelegate delegate;
-  final AppFlowyBoardController dataController;
-  final AppFlowyBoardScrollController? scrollManager;
-  final ScrollController? scrollController;
-  final AppFlowyBoardState boardState;
-  final BoxConstraints groupConstraints;
-  final AppFlowyBoardCardBuilder cardBuilder;
-  final BoardPhantomController phantomController;
-  final Widget? leading;
-  final Widget? trailing;
-  final Widget? background;
-  final ReorderFlexConfig reorderFlexConfig;
-  final AppFlowyBoardHeaderBuilder? headerBuilder;
-  final AppFlowyBoardFooterBuilder? footerBuilder;
-
   const _AppFlowyBoardContent({
     required this.config,
     required this.onReorder,
@@ -198,12 +183,29 @@ class _AppFlowyBoardContent extends StatefulWidget {
     this.trailing,
     this.scrollController,
     this.background,
-    this.footerBuilder,
     this.headerBuilder,
+    this.footerBuilder,
   }) : reorderFlexConfig = const ReorderFlexConfig(
           direction: Axis.horizontal,
           dragDirection: Axis.horizontal,
         );
+
+  final AppFlowyBoardConfig config;
+  final OnReorder onReorder;
+  final OverlapDragTargetDelegate delegate;
+  final AppFlowyBoardController dataController;
+  final AppFlowyBoardScrollController? scrollManager;
+  final AppFlowyBoardState boardState;
+  final BoxConstraints groupConstraints;
+  final AppFlowyBoardCardBuilder cardBuilder;
+  final BoardPhantomController phantomController;
+  final Widget? leading;
+  final Widget? trailing;
+  final ScrollController? scrollController;
+  final Widget? background;
+  final AppFlowyBoardHeaderBuilder? headerBuilder;
+  final AppFlowyBoardFooterBuilder? footerBuilder;
+  final ReorderFlexConfig reorderFlexConfig;
 
   @override
   State<_AppFlowyBoardContent> createState() => _AppFlowyBoardContentState();
@@ -218,120 +220,104 @@ class _AppFlowyBoardContentState extends State<_AppFlowyBoardContent> {
   void initState() {
     super.initState();
     _overlayEntry = BoardOverlayEntry(
-      builder: (context) {
-        return Stack(
-          alignment: AlignmentDirectional.topStart,
-          children: [
-            if (widget.background != null)
-              Container(
-                clipBehavior: Clip.hardEdge,
-                decoration: BoxDecoration(
-                  borderRadius:
-                      BorderRadius.circular(widget.config.boardCornerRadius),
-                ),
-                child: widget.background,
+      builder: (context) => Stack(
+        children: [
+          if (widget.background != null)
+            Container(
+              clipBehavior: Clip.hardEdge,
+              decoration: BoxDecoration(
+                borderRadius:
+                    BorderRadius.circular(widget.config.boardCornerRadius),
               ),
-            ReorderFlex(
-              config: widget.reorderFlexConfig,
-              scrollController: widget.scrollController,
-              onReorder: widget.onReorder,
-              dataSource: widget.dataController,
-              interceptor: OverlappingDragTargetInterceptor(
-                reorderFlexId: widget.dataController.identifier,
-                acceptedReorderFlexId: widget.dataController.groupIds,
-                delegate: widget.delegate,
-                columnsState: widget.boardState,
-              ),
-              leading: widget.leading,
-              trailing: widget.trailing,
-              groupWidth: widget.groupConstraints.maxWidth,
-              children: _buildColumns(),
+              child: widget.background,
             ),
-          ],
-        );
-      },
-      opaque: false,
+          ReorderFlex(
+            config: widget.reorderFlexConfig,
+            scrollController: widget.scrollController,
+            onReorder: widget.onReorder,
+            dataSource: widget.dataController,
+            interceptor: OverlappingDragTargetInterceptor(
+              reorderFlexId: widget.dataController.identifier,
+              acceptedReorderFlexId: widget.dataController.groupIds,
+              delegate: widget.delegate,
+              columnsState: widget.boardState,
+            ),
+            leading: widget.leading,
+            trailing: widget.trailing,
+            groupWidth: widget.groupConstraints.maxWidth,
+            children: _buildColumns(),
+          ),
+        ],
+      ),
     );
   }
 
   @override
-  Widget build(BuildContext context) {
-    return BoardOverlay(
-      key: _boardContentKey,
-      initialEntries: [_overlayEntry],
-    );
-  }
+  Widget build(BuildContext context) => BoardOverlay(
+        key: _boardContentKey,
+        initialEntries: [_overlayEntry],
+      );
 
   List<Widget> _buildColumns() {
     final List<Widget> children = [];
 
-    widget.dataController.groupDatas.asMap().entries.map(
-      (item) {
-        final columnData = item.value;
-        final columnIndex = item.key;
+    widget.dataController.groupDatas.asMap().entries.map((item) {
+      final columnData = item.value;
+      final columnIndex = item.key;
 
-        final dataSource = _BoardGroupDataSourceImpl(
-          groupId: columnData.id,
-          dataController: widget.dataController,
-        );
+      final dataSource = _BoardGroupDataSourceImpl(
+        groupId: columnData.id,
+        dataController: widget.dataController,
+      );
 
-        final reorderFlexAction = ReorderFlexActionImpl();
-        widget.boardState.reorderFlexActionMap[columnData.id] =
-            reorderFlexAction;
+      final reorderFlexAction = ReorderFlexActionImpl();
+      widget.boardState.reorderFlexActionMap[columnData.id] = reorderFlexAction;
 
-        children.add(
-          ChangeNotifierProvider.value(
-            key: ValueKey(columnData.id),
-            value: widget.dataController.getGroupController(columnData.id),
-            child: Consumer<AppFlowyGroupController>(
-              builder: (context, value, child) {
-                return ConstrainedBox(
-                  constraints: widget.groupConstraints,
-                  child: LayoutBuilder(
-                    // use LayoutBuilder to get the width of the group
-                    // and pass it to be used in [ReorderDragTarget]
-                    builder: (context, constraints) => AppFlowyBoardGroup(
-                      margin: _marginFromIndex(columnIndex),
-                      bodyPadding: widget.config.groupBodyPadding,
-                      headerBuilder: _buildHeader,
-                      footerBuilder: widget.footerBuilder,
-                      cardBuilder: widget.cardBuilder,
-                      dataSource: dataSource,
-                      scrollController: ScrollController(),
-                      phantomController: widget.phantomController,
-                      onReorder: widget.dataController.moveGroupItem,
-                      cornerRadius: widget.config.groupCornerRadius,
-                      backgroundColor: widget.config.groupBackgroundColor,
-                      dragStateStorage: widget.boardState,
-                      dragTargetKeys: widget.boardState,
-                      reorderFlexAction: reorderFlexAction,
-                      stretchGroupHeight: widget.config.stretchGroupHeight,
-                      groupWidth: constraints.maxWidth,
-                    ),
-                  ),
-                );
-              },
+      children.add(
+        ChangeNotifierProvider.value(
+          key: ValueKey(columnData.id),
+          value: widget.dataController.getGroupController(columnData.id),
+          child: Consumer<AppFlowyGroupController>(
+            builder: (context, value, child) => ConstrainedBox(
+              constraints: widget.groupConstraints,
+              child: LayoutBuilder(
+                // use LayoutBuilder to get the width of the group
+                // and pass it to be used in [ReorderDragTarget]
+                builder: (context, constraints) => AppFlowyBoardGroup(
+                  margin: _marginFromIndex(columnIndex),
+                  bodyPadding: widget.config.groupBodyPadding,
+                  headerBuilder: _buildHeader,
+                  footerBuilder: widget.footerBuilder,
+                  cardBuilder: widget.cardBuilder,
+                  dataSource: dataSource,
+                  scrollController: ScrollController(),
+                  phantomController: widget.phantomController,
+                  onReorder: widget.dataController.moveGroupItem,
+                  cornerRadius: widget.config.groupCornerRadius,
+                  backgroundColor: widget.config.groupBackgroundColor,
+                  dragStateStorage: widget.boardState,
+                  dragTargetKeys: widget.boardState,
+                  reorderFlexAction: reorderFlexAction,
+                  stretchGroupHeight: widget.config.stretchGroupHeight,
+                  groupWidth: constraints.maxWidth,
+                ),
+              ),
             ),
           ),
-        );
-      },
-    ).toList();
+        ),
+      );
+    }).toList();
 
     return children;
   }
 
-  Widget? _buildHeader(
-    BuildContext context,
-    AppFlowyGroupData groupData,
-  ) {
+  Widget? _buildHeader(BuildContext context, AppFlowyGroupData groupData) {
     if (widget.headerBuilder == null) {
       return null;
     }
     return Selector<AppFlowyGroupController, AppFlowyGroupHeaderData>(
       selector: (context, controller) => controller.groupData.headerData,
-      builder: (context, headerData, _) {
-        return widget.headerBuilder!(context, groupData)!;
-      },
+      builder: (context, _, __) => widget.headerBuilder!(context, groupData)!,
     );
   }
 
@@ -355,13 +341,13 @@ class _AppFlowyBoardContentState extends State<_AppFlowyBoardContent> {
 }
 
 class _BoardGroupDataSourceImpl extends AppFlowyGroupDataDataSource {
-  String groupId;
-  final AppFlowyBoardController dataController;
-
   _BoardGroupDataSourceImpl({
     required this.groupId,
     required this.dataController,
   });
+
+  final String groupId;
+  final AppFlowyBoardController dataController;
 
   @override
   AppFlowyGroupData get groupData =>
@@ -369,13 +355,6 @@ class _BoardGroupDataSourceImpl extends AppFlowyGroupDataDataSource {
 
   @override
   List<String> get acceptedGroupIds => dataController.groupIds;
-}
-
-/// A context contains the group states including the draggingState.
-///
-/// [draggingState] represents the dragging state of the group.
-class AppFlowyGroupContext {
-  DraggingState? draggingState;
 }
 
 class AppFlowyBoardState extends DraggingStateStorage
@@ -388,9 +367,8 @@ class AppFlowyBoardState extends DraggingStateStorage
   final Map<String, ReorderFlexActionImpl> reorderFlexActionMap = {};
 
   @override
-  DraggingState? readState(String reorderFlexId) {
-    return groupDragStates[reorderFlexId];
-  }
+  DraggingState? readState(String reorderFlexId) =>
+      groupDragStates[reorderFlexId];
 
   @override
   void insertState(String reorderFlexId, DraggingState state) {
@@ -422,12 +400,13 @@ class AppFlowyBoardState extends DraggingStateStorage
     String reorderFlexId,
     String key,
   ) {
-    Map<String, GlobalObjectKey>? group = groupDragTargetKeys[reorderFlexId];
+    final Map<String, GlobalObjectKey>? group =
+        groupDragTargetKeys[reorderFlexId];
     if (group != null) {
       return group[key];
-    } else {
-      return null;
     }
+
+    return null;
   }
 
   @override

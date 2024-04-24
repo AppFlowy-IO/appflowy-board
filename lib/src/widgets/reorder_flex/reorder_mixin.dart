@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import '../transitions.dart';
+
 import 'drag_target.dart';
 
 mixin ReorderFlexMixin {
@@ -22,17 +23,13 @@ mixin ReorderFlexMixin {
         ),
       );
     } else {
-      var transition = SizeTransition(
-        sizeFactor: sizeFactor,
-        axis: direction,
-        child: FadeTransition(opacity: animationController, child: child),
-      );
-
-      BoxConstraints contentSizeConstraints =
-          BoxConstraints.loose(draggingFeedbackSize);
       return ConstrainedBox(
-        constraints: contentSizeConstraints,
-        child: transition,
+        constraints: BoxConstraints.loose(draggingFeedbackSize),
+        child: SizeTransition(
+          sizeFactor: sizeFactor,
+          axis: direction,
+          child: FadeTransition(opacity: animationController, child: child),
+        ),
       );
     }
   }
@@ -55,30 +52,16 @@ mixin ReorderFlexMixin {
         ),
       );
     } else {
-      var transition = SizeTransition(
-        sizeFactor: sizeFactor,
-        axis: direction,
-        child: FadeTransition(opacity: animationController, child: child),
-      );
-
-      BoxConstraints contentSizeConstraints =
-          BoxConstraints.loose(draggingFeedbackSize);
       return ConstrainedBox(
-        constraints: contentSizeConstraints,
-        child: transition,
+        constraints: BoxConstraints.loose(draggingFeedbackSize),
+        child: SizeTransition(
+          sizeFactor: sizeFactor,
+          axis: direction,
+          child: FadeTransition(opacity: animationController, child: child),
+        ),
       );
     }
   }
-}
-
-Animation<double> withCurve(
-  AnimationController animationController,
-  Cubic curve,
-) {
-  return CurvedAnimation(
-    parent: animationController,
-    curve: curve,
-  );
 }
 
 extension CurveAnimationController on AnimationController {
@@ -87,10 +70,7 @@ extension CurveAnimationController on AnimationController {
   }
 
   Animation<double> withCurve(Curve curve) {
-    return CurvedAnimation(
-      parent: this,
-      curve: curve,
-    );
+    return CurvedAnimation(parent: this, curve: curve);
   }
 }
 
@@ -98,7 +78,7 @@ class ReorderFlexNotifier extends DragTargetMovePlaceholderDelegate {
   Map<int, DragTargetEventNotifier> dragTargeEventNotifier = {};
 
   void updateDragTargetIndex(int index) {
-    for (var notifier in dragTargeEventNotifier.values) {
+    for (final notifier in dragTargeEventNotifier.values) {
       notifier.setDragTargetIndex(index);
     }
   }
@@ -115,7 +95,7 @@ class ReorderFlexNotifier extends DragTargetMovePlaceholderDelegate {
   }
 
   void dispose() {
-    for (var notifier in dragTargeEventNotifier.values) {
+    for (final notifier in dragTargeEventNotifier.values) {
       notifier.dispose();
     }
   }
