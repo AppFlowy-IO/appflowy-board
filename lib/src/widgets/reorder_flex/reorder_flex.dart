@@ -144,9 +144,6 @@ class ReorderFlexState extends State<ReorderFlex>
   /// Controls scrolls and measures scroll progress.
   late ScrollController _scrollController;
 
-  /// Records the position of the [Scrollable]
-  ScrollPosition? _attachedScrollPosition;
-
   /// Whether or not we are currently scrolling this view to show a widget.
   bool _scrolling = false;
 
@@ -188,36 +185,15 @@ class ReorderFlexState extends State<ReorderFlex>
     widget.reorderFlexAction?._resetDragTargetIndex = (index) {
       resetDragTargetIndex(index);
     };
-  }
 
-  @override
-  void didChangeDependencies() {
-    if (_attachedScrollPosition != null) {
-      _scrollController.detach(_attachedScrollPosition!);
-      _attachedScrollPosition = null;
-    }
-
-    _scrollController = widget.scrollController ??
-        PrimaryScrollController.maybeOf(context) ??
-        ScrollController();
-
-    if (_scrollController.hasClients) {
-      _attachedScrollPosition = Scrollable.maybeOf(context)?.position;
-    } else {
-      _attachedScrollPosition = null;
-    }
-
-    if (_attachedScrollPosition != null) {
-      _scrollController.attach(_attachedScrollPosition!);
-    }
-    super.didChangeDependencies();
+    _scrollController = widget.scrollController ?? ScrollController();
   }
 
   @override
   Widget build(BuildContext context) {
     final List<Widget> children = [];
 
-    for (int i = 0; i < widget.children.length; i += 1) {
+    for (int i = 0; i < widget.children.length; i++) {
       final Widget child = widget.children[i];
       final ReoderFlexItem item = widget.dataSource.items[i];
 
@@ -232,17 +208,11 @@ class ReorderFlexState extends State<ReorderFlex>
       children.add(_wrap(child, i, indexKey, item.draggable));
     }
 
-    final child = _wrapContainer(children);
-    return _wrapScrollView(child: child);
+    return _wrapContainer(children);
   }
 
   @override
   void dispose() {
-    if (_attachedScrollPosition != null) {
-      _scrollController.detach(_attachedScrollPosition!);
-      _attachedScrollPosition = null;
-    }
-
     _animation.dispose();
     super.dispose();
   }
@@ -602,21 +572,6 @@ class ReorderFlexState extends State<ReorderFlex>
     }
 
     _animation.reverseAnimation();
-  }
-
-  Widget _wrapScrollView({required Widget child}) {
-    if (PrimaryScrollController.maybeOf(context) == null) {
-      return child;
-    } else {
-      return ScrollConfiguration(
-        behavior: ScrollConfiguration.of(context).copyWith(scrollbars: true),
-        child: SingleChildScrollView(
-          scrollDirection: widget.config.direction,
-          controller: _scrollController,
-          child: child,
-        ),
-      );
-    }
   }
 
   Widget _wrapContainer(List<Widget> children) {
