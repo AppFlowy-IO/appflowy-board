@@ -1,11 +1,10 @@
 import 'dart:io';
 
-import 'package:appflowy_board/appflowy_board.dart';
-import 'package:appflowy_board/src/utils/log.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
-import 'package:provider/provider.dart';
+
+import 'package:appflowy_board/appflowy_board.dart';
+import 'package:appflowy_board/src/utils/log.dart';
 
 import '../transitions.dart';
 
@@ -46,17 +45,37 @@ typedef DragTargetOnEnded<T extends DragTargetData> = void Function(
 /// The size of the [ReorderDragTarget] will become zero when it start dragging.
 ///
 class ReorderDragTarget<T extends DragTargetData> extends StatefulWidget {
-  final Widget child;
-  final T dragTargetData;
+  const ReorderDragTarget({
+    super.key,
+    required this.child,
+    required this.indexGlobalKey,
+    required this.dragTargetData,
+    required this.onDragStarted,
+    required this.onDragMoved,
+    required this.onDragEnded,
+    required this.onWillAcceptWithDetails,
+    this.onAccceptWithDetails,
+    required this.insertAnimationController,
+    required this.deleteAnimationController,
+    required this.useMoveAnimation,
+    required this.draggable,
+    required this.scrollController,
+    required this.groupWidth,
+    this.onLeave,
+    this.draggableTargetBuilder,
+    this.draggingOpacity = 0.3,
+    this.dragDirection,
+  });
 
+  final Widget child;
   final GlobalObjectKey indexGlobalKey;
+  final T dragTargetData;
 
   /// Called when dragTarget is being dragging.
   final DragTargetOnStarted onDragStarted;
 
-  final DragTargetOnEnded<T> onDragEnded;
-
   final DragTargetOnMove<T> onDragMoved;
+  final DragTargetOnEnded<T> onDragEnded;
 
   /// Called to determine whether this widget is interested in receiving a given
   /// piece of data being dragged over this drag target.
@@ -68,49 +87,20 @@ class ReorderDragTarget<T extends DragTargetData> extends StatefulWidget {
   /// Called when an acceptable piece of data was dropped over this drag target.
   final void Function(T dragTargetData)? onAccceptWithDetails;
 
+  final AnimationController insertAnimationController;
+  final AnimationController deleteAnimationController;
+  final bool useMoveAnimation;
+  final IsDraggable draggable;
+  final ScrollController scrollController;
+  final double groupWidth;
+
   /// Called when a given piece of data being dragged over this target leaves
   /// the target.
   final void Function(T dragTargetData)? onLeave;
 
   final ReorderFlexDraggableTargetBuilder? draggableTargetBuilder;
-
-  final AnimationController insertAnimationController;
-
-  final AnimationController deleteAnimationController;
-
-  final bool useMoveAnimation;
-
-  final IsDraggable draggable;
-
   final double draggingOpacity;
-
   final Axis? dragDirection;
-
-  final ScrollController scrollController;
-
-  final double groupWidth;
-
-  const ReorderDragTarget({
-    super.key,
-    required this.child,
-    required this.indexGlobalKey,
-    required this.dragTargetData,
-    required this.onDragStarted,
-    required this.onDragMoved,
-    required this.onDragEnded,
-    required this.onWillAcceptWithDetails,
-    required this.insertAnimationController,
-    required this.deleteAnimationController,
-    required this.useMoveAnimation,
-    required this.draggable,
-    required this.scrollController,
-    required this.groupWidth,
-    this.onAccceptWithDetails,
-    this.onLeave,
-    this.draggableTargetBuilder,
-    this.draggingOpacity = 0.3,
-    this.dragDirection,
-  });
 
   @override
   State<ReorderDragTarget<T>> createState() => _ReorderDragTargetState<T>();
@@ -125,12 +115,10 @@ class _ReorderDragTargetState<T extends DragTargetData>
   Widget build(BuildContext context) {
     Widget dragTarget = DragTarget<T>(
       builder: _buildDraggableWidget,
-      onWillAcceptWithDetails: (details) {
-        return widget.onWillAcceptWithDetails(details.data);
-      },
-      onAcceptWithDetails: (details) {
-        widget.onAccceptWithDetails?.call(details.data);
-      },
+      onWillAcceptWithDetails: (details) =>
+          widget.onWillAcceptWithDetails(details.data),
+      onAcceptWithDetails: (details) =>
+          widget.onAccceptWithDetails?.call(details.data),
       onMove: (detail) {
         // Expand the scroll view horizontally when the dragging is near the edge of the scroll view.
         // It is used to move card to the other group.
@@ -174,9 +162,9 @@ class _ReorderDragTargetState<T extends DragTargetData>
     List<T?> acceptedCandidates,
     List<dynamic> rejectedCandidates,
   ) {
-    Widget feedbackBuilder = Builder(
+    final feedbackBuilder = Builder(
       builder: (BuildContext context) {
-        BoxConstraints contentSizeConstraints =
+        final BoxConstraints contentSizeConstraints =
             BoxConstraints.loose(_draggingFeedbackSize!);
         return _buildDraggableFeedback(
           context,
@@ -218,20 +206,16 @@ class _ReorderDragTargetState<T extends DragTargetData>
               _draggingFeedbackSize,
             );
           },
-          dragAnchorStrategy: childDragAnchorStrategy,
 
           /// When the drag ends inside a DragTarget widget, the drag
           /// succeeds, and we reorder the widget into position appropriately.
-          onDragCompleted: () {
-            widget.onDragEnded(widget.dragTargetData);
-          },
+          onDragCompleted: () => widget.onDragEnded(widget.dragTargetData),
 
           /// When the drag does not end inside a DragTarget widget, the
           /// drag fails, but we still reorder the widget to the last position it
           /// had been dragged to.
-          onDraggableCanceled: (Velocity velocity, Offset offset) {
-            widget.onDragEnded(widget.dragTargetData);
-          },
+          onDraggableCanceled: (_, __) =>
+              widget.onDragEnded(widget.dragTargetData),
           child: widget.child,
         );
       }
@@ -254,20 +238,16 @@ class _ReorderDragTargetState<T extends DragTargetData>
             _draggingFeedbackSize,
           );
         },
-        dragAnchorStrategy: childDragAnchorStrategy,
 
         /// When the drag ends inside a DragTarget widget, the drag
         /// succeeds, and we reorder the widget into position appropriately.
-        onDragCompleted: () {
-          widget.onDragEnded(widget.dragTargetData);
-        },
+        onDragCompleted: () => widget.onDragEnded(widget.dragTargetData),
 
         /// When the drag does not end inside a DragTarget widget, the
         /// drag fails, but we still reorder the widget to the last position it
         /// had been dragged to.
-        onDraggableCanceled: (Velocity velocity, Offset offset) {
-          widget.onDragEnded(widget.dragTargetData);
-        },
+        onDraggableCanceled: (_, __) =>
+            widget.onDragEnded(widget.dragTargetData),
         child: widget.child,
       );
     }
@@ -297,27 +277,10 @@ class _ReorderDragTargetState<T extends DragTargetData>
 }
 
 class DragTargetAnimation {
-  // How long an animation to reorder an element in the list takes.
-  final Duration reorderAnimationDuration;
-
-  // This controls the entrance of the dragging widget into a new place.
-  late AnimationController entranceController;
-
-  // This controls the 'phantom' of the dragging widget, which is left behind
-  // where the widget used to be.
-  late AnimationController phantomController;
-
-  // Uses to simulate the insert animation when card was moved from on group to
-  // another group. Check out the [FakeDragTarget].
-  late AnimationController insertController;
-
-  // Used to remove the phantom
-  late AnimationController deleteController;
-
   DragTargetAnimation({
     required this.reorderAnimationDuration,
-    required TickerProvider vsync,
     required void Function(AnimationStatus) entranceAnimateStatusChanged,
+    required TickerProvider vsync,
   }) {
     entranceController = AnimationController(
       value: 1.0,
@@ -345,9 +308,24 @@ class DragTargetAnimation {
     );
   }
 
-  void startDragging() {
-    entranceController.value = 1.0;
-  }
+  // How long an animation to reorder an element in the list takes.
+  final Duration reorderAnimationDuration;
+
+  // This controls the entrance of the dragging widget into a new place.
+  late AnimationController entranceController;
+
+  // This controls the 'phantom' of the dragging widget, which is left behind
+  // where the widget used to be.
+  late AnimationController phantomController;
+
+  // Uses to simulate the insert animation when card was moved from on group to
+  // another group. Check out the [FakeDragTarget].
+  late AnimationController insertController;
+
+  // Used to remove the phantom
+  late AnimationController deleteController;
+
+  void startDragging() => entranceController.value = 1.0;
 
   void animateToNext() {
     phantomController.reverse(from: 1.0);
@@ -368,16 +346,16 @@ class DragTargetAnimation {
 }
 
 class IgnorePointerWidget extends StatelessWidget {
-  final Widget? child;
-  final bool useIntrinsicSize;
-  final double opacity;
-
   const IgnorePointerWidget({
     super.key,
     required this.child,
     required this.opacity,
     this.useIntrinsicSize = false,
   });
+
+  final Widget? child;
+  final double opacity;
+  final bool useIntrinsicSize;
 
   @override
   Widget build(BuildContext context) {
@@ -386,7 +364,6 @@ class IgnorePointerWidget extends StatelessWidget {
         : SizedBox(width: 0.0, height: 0.0, child: child);
 
     return IgnorePointer(
-      ignoring: true,
       child: Opacity(
         opacity: useIntrinsicSize ? opacity : 0.0,
         child: sizedChild,
@@ -396,15 +373,16 @@ class IgnorePointerWidget extends StatelessWidget {
 }
 
 class AbsorbPointerWidget extends StatelessWidget {
-  final Widget? child;
-  final bool useIntrinsicSize;
-  final double opacity;
   const AbsorbPointerWidget({
     super.key,
     required this.child,
     required this.opacity,
     this.useIntrinsicSize = false,
   });
+
+  final Widget? child;
+  final double opacity;
+  final bool useIntrinsicSize;
 
   @override
   Widget build(BuildContext context) {
@@ -422,20 +400,14 @@ class AbsorbPointerWidget extends StatelessWidget {
 }
 
 class PhantomWidget extends StatelessWidget {
+  const PhantomWidget({super.key, this.child, this.opacity = 1.0});
+
   final Widget? child;
   final double opacity;
-  const PhantomWidget({
-    super.key,
-    this.child,
-    this.opacity = 1.0,
-  });
 
   @override
   Widget build(BuildContext context) {
-    return Opacity(
-      opacity: opacity,
-      child: child,
-    );
+    return Opacity(opacity: opacity, child: child);
   }
 }
 
@@ -446,73 +418,6 @@ abstract class DragTargetMovePlaceholderDelegate {
   );
 
   void unregisterPlaceholder(int dragTargetIndex);
-}
-
-class DragTargeMovePlaceholder extends StatefulWidget {
-  final double height;
-  final Color color;
-  final Color highlightColor;
-  final int dragTargetIndex;
-  final DragTargetMovePlaceholderDelegate delegate;
-
-  const DragTargeMovePlaceholder({
-    super.key,
-    required this.delegate,
-    required this.dragTargetIndex,
-    this.height = 4,
-    this.color = Colors.transparent,
-    this.highlightColor = Colors.lightBlue,
-  });
-
-  @override
-  State<DragTargeMovePlaceholder> createState() =>
-      _DragTargeMovePlaceholderState();
-}
-
-class _DragTargeMovePlaceholderState extends State<DragTargeMovePlaceholder> {
-  ValueNotifier<bool> isHighlight = ValueNotifier(false);
-
-  @override
-  void initState() {
-    widget.delegate.registerPlaceholder(
-      widget.dragTargetIndex,
-      (currentDragTargetIndex) {
-        if (!mounted) return;
-
-        SchedulerBinding.instance.addPostFrameCallback((Duration duration) {
-          if (currentDragTargetIndex == -1) {
-            isHighlight.value = false;
-          } else {
-            isHighlight.value =
-                widget.dragTargetIndex == currentDragTargetIndex;
-          }
-        });
-      },
-    );
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    isHighlight.dispose();
-    widget.delegate.unregisterPlaceholder(widget.dragTargetIndex);
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ChangeNotifierProvider.value(
-      value: isHighlight,
-      child: Consumer<ValueNotifier<bool>>(
-        builder: (context, notifier, child) {
-          return Container(
-            height: widget.height,
-            color: notifier.value ? widget.highlightColor : widget.color,
-          );
-        },
-      ),
-    );
-  }
 }
 
 abstract class FakeDragTargetEventTrigger {
@@ -527,14 +432,6 @@ abstract class FakeDragTargetEventData {
 }
 
 class FakeDragTarget<T extends DragTargetData> extends StatefulWidget {
-  final FakeDragTargetEventTrigger eventTrigger;
-  final FakeDragTargetEventData eventData;
-  final DragTargetOnStarted onDragStarted;
-  final DragTargetOnEnded<T> onDragEnded;
-  final DragTargetWillAccepted<T> onWillAccept;
-  final Widget child;
-  final AnimationController insertAnimationController;
-  final AnimationController deleteAnimationController;
   const FakeDragTarget({
     super.key,
     required this.eventTrigger,
@@ -547,6 +444,15 @@ class FakeDragTarget<T extends DragTargetData> extends StatefulWidget {
     required this.child,
   });
 
+  final FakeDragTargetEventTrigger eventTrigger;
+  final FakeDragTargetEventData eventData;
+  final DragTargetOnStarted onDragStarted;
+  final DragTargetOnEnded<T> onDragEnded;
+  final DragTargetWillAccepted<T> onWillAccept;
+  final AnimationController insertAnimationController;
+  final AnimationController deleteAnimationController;
+  final Widget child;
+
   @override
   State<FakeDragTarget<T>> createState() => _FakeDragTargetState<T>();
 }
@@ -558,6 +464,8 @@ class _FakeDragTargetState<T extends DragTargetData>
 
   @override
   void initState() {
+    super.initState();
+
     widget.insertAnimationController.addStatusListener(
       _onInsertedAnimationStatusChanged,
     );
@@ -565,18 +473,12 @@ class _FakeDragTargetState<T extends DragTargetData>
     /// Start insert animation
     widget.insertAnimationController.forward(from: 0.0);
 
-    // widget.eventTrigger.fakeOnDragStart((insertIndex) {
-    //   Log.trace("[$FakeDragTarget] on drag $insertIndex");
-    // });
-
     widget.eventTrigger.fakeOnDragEnded(() {
       Log.trace("[$FakeDragTarget] on drag end");
       WidgetsBinding.instance.addPostFrameCallback((_) {
         widget.onDragEnded(widget.eventData.dragTargetData as T);
       });
     });
-
-    super.initState();
   }
 
   @override
@@ -591,7 +493,6 @@ class _FakeDragTargetState<T extends DragTargetData>
     if (simulateDragging) {
       return SizeTransitionWithIntrinsicSize(
         sizeFactor: widget.deleteAnimationController,
-        axis: Axis.vertical,
         child: AbsorbPointerWidget(
           opacity: 0.3,
           child: widget.child,
@@ -600,7 +501,6 @@ class _FakeDragTargetState<T extends DragTargetData>
     } else {
       return SizeTransitionWithIntrinsicSize(
         sizeFactor: widget.insertAnimationController,
-        axis: Axis.vertical,
         child: AbsorbPointerWidget(
           useIntrinsicSize: true,
           opacity: 0.3,

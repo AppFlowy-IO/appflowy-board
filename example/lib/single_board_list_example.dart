@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:appflowy_board/appflowy_board.dart';
 
 class SingleBoardListExample extends StatefulWidget {
@@ -13,6 +14,7 @@ class _SingleBoardListExampleState extends State<SingleBoardListExample> {
 
   @override
   void initState() {
+    super.initState();
     final column = AppFlowyGroupData(
       id: "1",
       name: "1",
@@ -25,7 +27,6 @@ class _SingleBoardListExampleState extends State<SingleBoardListExample> {
     );
 
     boardData.addGroup(column);
-    super.initState();
   }
 
   @override

@@ -1,9 +1,15 @@
 import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 
 class BoardOverlayEntry {
+  BoardOverlayEntry({
+    required this.builder,
+    bool opaque = false,
+  }) : _opaque = opaque;
+
   /// This entry will include the widget built by this builder in the overlay at
   /// the entry's position.
   /// The builder will be called again after calling [markNeedsBuild] on this entry.
@@ -27,11 +33,6 @@ class BoardOverlayEntry {
     assert(_overlay != null);
     _overlay!._didChangeEntryOpacity();
   }
-
-  BoardOverlayEntry({
-    required this.builder,
-    bool opaque = false,
-  }) : _opaque = opaque;
 
   /// If this method is called while the [SchedulerBinding.schedulerPhase] is
   /// [SchedulerPhase.persistentCallbacks], i.e. during the build, layout, or
@@ -65,12 +66,12 @@ class BoardOverlayEntry {
 /// each of these widgets manage their participation in the overlay using
 /// [OverlayEntry] objects.
 class BoardOverlay extends StatefulWidget {
-  final List<BoardOverlayEntry> initialEntries;
-
   const BoardOverlay({
     super.key,
     this.initialEntries = const <BoardOverlayEntry>[],
   });
+
+  final List<BoardOverlayEntry> initialEntries;
 
   static BoardOverlayState of(
     BuildContext context, {
@@ -138,7 +139,8 @@ class BoardOverlayState extends State<BoardOverlay>
       above == null || (above._overlay == this && _entries.contains(above)),
     );
     if (entries.isEmpty) return;
-    for (BoardOverlayEntry entry in entries) {
+
+    for (final entry in entries) {
       assert(entry._overlay == null);
       entry._overlay = this;
     }
@@ -151,18 +153,15 @@ class BoardOverlayState extends State<BoardOverlay>
 
   void _remove(BoardOverlayEntry entry) {
     if (mounted) {
-      _entries.remove(entry);
       setState(() {
-        /* entry was removed */
+        _entries.remove(entry);
       });
     }
   }
 
   void _didChangeEntryOpacity() {
-    setState(() {
-      // We use the opacity of the entry in our build function, which means we
-      // our state has changed.
-    });
+    // We use the opacity of the entry in our build function, which means state has changed.
+    setState(() {});
   }
 
   @override
@@ -182,8 +181,8 @@ class BoardOverlayState extends State<BoardOverlay>
     }
     return _BoardStack(
       onstage: Stack(
+        // HanSheng changed it to passthrough so that this widget doesn't change layout constraints
         fit: StackFit.passthrough,
-        //HanSheng changed it to passthrough so that this widget doesn't change layout constraints
         children: onstageChildren.reversed.toList(growable: false),
       ),
       offstage: offstageChildren,
@@ -227,13 +226,13 @@ class _OverlayEntryWidgetState extends State<_OverlayEntryWidget> {
 /// For convenience, it is legal to use [Positioned] widgets around the offstage
 /// widgets.
 class _BoardStack extends RenderObjectWidget {
-  final Stack? onstage;
-  final List<Widget> offstage;
-
   const _BoardStack({
     required this.offstage,
     this.onstage,
   });
+
+  final List<Widget> offstage;
+  final Stack? onstage;
 
   @override
   _BoardStackElement createElement() => _BoardStackElement(this);
@@ -244,13 +243,14 @@ class _BoardStack extends RenderObjectWidget {
 }
 
 class _BoardStackElement extends RenderObjectElement {
-  Element? _onstage;
-  static final Object _onstageSlot = Object();
-  late List<Element> _offstage;
-  final Set<Element> _forgottenOffstageChildren = HashSet<Element>();
-
   _BoardStackElement(_BoardStack super.widget)
       : assert(!debugChildrenHaveDuplicateKeys(widget, widget.offstage));
+
+  static const Object _onstageSlot = Object();
+
+  Element? _onstage;
+  late List<Element> _offstage;
+  final Set<Element> _forgottenOffstageChildren = HashSet<Element>();
 
   @override
   _BoardStack get widget => super.widget as _BoardStack;
@@ -300,7 +300,7 @@ class _BoardStackElement extends RenderObjectElement {
   @override
   void visitChildren(ElementVisitor visitor) {
     if (_onstage != null) visitor(_onstage!);
-    for (Element child in _offstage) {
+    for (final child in _offstage) {
       if (!_forgottenOffstageChildren.contains(child)) visitor(child);
     }
   }
