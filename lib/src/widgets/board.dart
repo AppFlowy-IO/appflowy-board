@@ -147,7 +147,7 @@ class AppFlowyBoard extends StatelessWidget {
 
           return _AppFlowyBoardContent(
             config: config,
-            dataController: controller,
+            boardController: controller,
             scrollController: scrollController,
             scrollManager: boardScrollController,
             boardState: boardState,
@@ -173,7 +173,7 @@ class _AppFlowyBoardContent extends StatefulWidget {
     required this.config,
     required this.onReorder,
     required this.delegate,
-    required this.dataController,
+    required this.boardController,
     required this.scrollManager,
     required this.boardState,
     required this.groupConstraints,
@@ -193,7 +193,7 @@ class _AppFlowyBoardContent extends StatefulWidget {
   final AppFlowyBoardConfig config;
   final OnReorder onReorder;
   final OverlapDragTargetDelegate delegate;
-  final AppFlowyBoardController dataController;
+  final AppFlowyBoardController boardController;
   final AppFlowyBoardScrollController? scrollManager;
   final AppFlowyBoardState boardState;
   final BoxConstraints groupConstraints;
@@ -235,16 +235,15 @@ class _AppFlowyBoardContentState extends State<_AppFlowyBoardContent> {
             config: widget.reorderFlexConfig,
             scrollController: widget.scrollController,
             onReorder: widget.onReorder,
-            dataSource: widget.dataController,
+            dataSource: widget.boardController,
             interceptor: OverlappingDragTargetInterceptor(
-              reorderFlexId: widget.dataController.identifier,
-              acceptedReorderFlexId: widget.dataController.groupIds,
+              reorderFlexId: widget.boardController.identifier,
+              acceptedReorderFlexId: widget.boardController.groupIds,
               delegate: widget.delegate,
               columnsState: widget.boardState,
             ),
             leading: widget.leading,
             trailing: widget.trailing,
-            groupWidth: widget.groupConstraints.maxWidth,
             children: _buildColumns(),
           ),
         ],
@@ -261,13 +260,13 @@ class _AppFlowyBoardContentState extends State<_AppFlowyBoardContent> {
   List<Widget> _buildColumns() {
     final List<Widget> children = [];
 
-    widget.dataController.groupDatas.asMap().entries.map((item) {
+    widget.boardController.groupDatas.asMap().entries.map((item) {
       final columnData = item.value;
       final columnIndex = item.key;
 
       final dataSource = _BoardGroupDataSourceImpl(
         groupId: columnData.id,
-        dataController: widget.dataController,
+        boardController: widget.boardController,
       );
 
       final reorderFlexAction = ReorderFlexActionImpl();
@@ -276,31 +275,26 @@ class _AppFlowyBoardContentState extends State<_AppFlowyBoardContent> {
       children.add(
         ChangeNotifierProvider.value(
           key: ValueKey(columnData.id),
-          value: widget.dataController.getGroupController(columnData.id),
+          value: widget.boardController.getGroupController(columnData.id),
           child: Consumer<AppFlowyGroupController>(
             builder: (context, value, child) => ConstrainedBox(
               constraints: widget.groupConstraints,
-              child: LayoutBuilder(
-                // use LayoutBuilder to get the width of the group
-                // and pass it to be used in [ReorderDragTarget]
-                builder: (context, constraints) => AppFlowyBoardGroup(
-                  margin: _marginFromIndex(columnIndex),
-                  bodyPadding: widget.config.groupBodyPadding,
-                  headerBuilder: _buildHeader,
-                  footerBuilder: widget.footerBuilder,
-                  cardBuilder: widget.cardBuilder,
-                  dataSource: dataSource,
-                  scrollController: ScrollController(),
-                  phantomController: widget.phantomController,
-                  onReorder: widget.dataController.moveGroupItem,
-                  cornerRadius: widget.config.groupCornerRadius,
-                  backgroundColor: widget.config.groupBackgroundColor,
-                  dragStateStorage: widget.boardState,
-                  dragTargetKeys: widget.boardState,
-                  reorderFlexAction: reorderFlexAction,
-                  stretchGroupHeight: widget.config.stretchGroupHeight,
-                  groupWidth: constraints.maxWidth,
-                ),
+              child: AppFlowyBoardGroup(
+                margin: _marginFromIndex(columnIndex),
+                bodyPadding: widget.config.groupBodyPadding,
+                headerBuilder: _buildHeader,
+                footerBuilder: widget.footerBuilder,
+                cardBuilder: widget.cardBuilder,
+                dataSource: dataSource,
+                scrollController: ScrollController(),
+                phantomController: widget.phantomController,
+                onReorder: widget.boardController.moveGroupItem,
+                cornerRadius: widget.config.groupCornerRadius,
+                backgroundColor: widget.config.groupBackgroundColor,
+                dragStateStorage: widget.boardState,
+                dragTargetKeys: widget.boardState,
+                reorderFlexAction: reorderFlexAction,
+                stretchGroupHeight: widget.config.stretchGroupHeight,
               ),
             ),
           ),
@@ -322,7 +316,7 @@ class _AppFlowyBoardContentState extends State<_AppFlowyBoardContent> {
   }
 
   EdgeInsets _marginFromIndex(int index) {
-    if (widget.dataController.groupDatas.isEmpty) {
+    if (widget.boardController.groupDatas.isEmpty) {
       return widget.config.groupMargin;
     }
 
@@ -331,7 +325,7 @@ class _AppFlowyBoardContentState extends State<_AppFlowyBoardContent> {
       return widget.config.groupMargin.copyWith(left: 0);
     }
 
-    if (index == widget.dataController.groupDatas.length - 1) {
+    if (index == widget.boardController.groupDatas.length - 1) {
       // remove the right padding of the last group
       return widget.config.groupMargin.copyWith(right: 0);
     }
@@ -343,18 +337,18 @@ class _AppFlowyBoardContentState extends State<_AppFlowyBoardContent> {
 class _BoardGroupDataSourceImpl extends AppFlowyGroupDataDataSource {
   _BoardGroupDataSourceImpl({
     required this.groupId,
-    required this.dataController,
+    required this.boardController,
   });
 
   final String groupId;
-  final AppFlowyBoardController dataController;
+  final AppFlowyBoardController boardController;
 
   @override
   AppFlowyGroupData get groupData =>
-      dataController.getGroupController(groupId)!.groupData;
+      boardController.getGroupController(groupId)!.groupData;
 
   @override
-  List<String> get acceptedGroupIds => dataController.groupIds;
+  List<String> get acceptedGroupIds => boardController.groupIds;
 }
 
 class AppFlowyBoardState extends DraggingStateStorage

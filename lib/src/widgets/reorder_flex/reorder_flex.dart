@@ -95,7 +95,6 @@ class ReorderFlex extends StatefulWidget {
     required this.children,
     required this.config,
     required this.onReorder,
-    required this.groupWidth,
     this.dragStateStorage,
     this.dragTargetKeys,
     this.onDragStarted,
@@ -115,8 +114,6 @@ class ReorderFlex extends StatefulWidget {
 
   /// [onReorder] is called when dragTarget did end dragging
   final OnReorder onReorder;
-
-  final double groupWidth;
 
   /// Save the [DraggingState] if the current [ReorderFlex] get reinitialize.
   final DraggingStateStorage? dragStateStorage;
@@ -419,7 +416,6 @@ class ReorderFlexState extends State<ReorderFlex>
   ) {
     final reorderFlexItem = widget.dataSource.items[dragTargetIndex];
     return ReorderDragTarget<FlexDragTargetData>(
-      scrollController: _scrollController,
       indexGlobalKey: indexKey,
       draggable: draggable,
       dragTargetData: FlexDragTargetData(
@@ -430,7 +426,6 @@ class ReorderFlexState extends State<ReorderFlex>
         dragTargetId: reorderFlexItem.id,
         dragTargetIndexKey: indexKey,
       ),
-      groupWidth: widget.groupWidth,
       onDragStarted: (draggingWidget, draggingIndex, size) {
         Log.debug(
           "[DragTarget] Group \"${widget.dataSource.identifier}\" start dragging item at index $draggingIndex",

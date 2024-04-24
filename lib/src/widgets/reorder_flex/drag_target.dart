@@ -59,8 +59,6 @@ class ReorderDragTarget<T extends DragTargetData> extends StatefulWidget {
     required this.deleteAnimationController,
     required this.useMoveAnimation,
     required this.draggable,
-    required this.scrollController,
-    required this.groupWidth,
     this.onLeave,
     this.draggableTargetBuilder,
     this.draggingOpacity = 0.3,
@@ -91,8 +89,6 @@ class ReorderDragTarget<T extends DragTargetData> extends StatefulWidget {
   final AnimationController deleteAnimationController;
   final bool useMoveAnimation;
   final IsDraggable draggable;
-  final ScrollController scrollController;
-  final double groupWidth;
 
   /// Called when a given piece of data being dragged over this target leaves
   /// the target.
@@ -120,28 +116,28 @@ class _ReorderDragTargetState<T extends DragTargetData>
       onAcceptWithDetails: (details) =>
           widget.onAccceptWithDetails?.call(details.data),
       onMove: (detail) {
-        // Expand the scroll view horizontally when the dragging is near the edge of the scroll view.
-        // It is used to move card to the other group.
-        final scrollController = widget.scrollController;
-        final maxScrollExtent = scrollController.position.maxScrollExtent;
-        final minScrollExtent = scrollController.position.minScrollExtent;
-        const expandDistance = 20;
+        // // Expand the scroll view horizontally when the dragging is near the edge of the scroll view.
+        // // It is used to move card to the other group.
+        // final scrollController = widget.scrollController;
+        // final maxScrollExtent = scrollController.position.maxScrollExtent;
+        // final minScrollExtent = scrollController.position.minScrollExtent;
+        // const expandDistance = 20;
 
-        if (detail.offset.dx >
-            MediaQuery.of(context).size.width - widget.groupWidth) {
-          final newPosition =
-              scrollController.offset + expandDistance > maxScrollExtent
-                  ? maxScrollExtent
-                  : scrollController.offset + expandDistance;
-          widget.scrollController.jumpTo(newPosition);
-        }
-        if (detail.offset.dx < 20) {
-          final newPosition =
-              scrollController.offset - expandDistance < minScrollExtent
-                  ? minScrollExtent
-                  : scrollController.offset - expandDistance;
-          widget.scrollController.jumpTo(newPosition);
-        }
+        // if (detail.offset.dx >
+        //     MediaQuery.of(context).size.width - widget.groupWidth) {
+        //   final newPosition =
+        //       scrollController.offset + expandDistance > maxScrollExtent
+        //           ? maxScrollExtent
+        //           : scrollController.offset + expandDistance;
+        //   widget.scrollController.jumpTo(newPosition);
+        // }
+        // if (detail.offset.dx < 20) {
+        //   final newPosition =
+        //       scrollController.offset - expandDistance < minScrollExtent
+        //           ? minScrollExtent
+        //           : scrollController.offset - expandDistance;
+        //   widget.scrollController.jumpTo(newPosition);
+        // }
 
         widget.onDragMoved(detail.data, detail.offset);
       },

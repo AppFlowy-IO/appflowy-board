@@ -68,7 +68,6 @@ class AppFlowyBoardGroup extends StatefulWidget {
     required this.onReorder,
     required this.dataSource,
     required this.phantomController,
-    required this.groupWidth,
     this.headerBuilder,
     this.footerBuilder,
     this.reorderFlexAction,
@@ -88,7 +87,6 @@ class AppFlowyBoardGroup extends StatefulWidget {
   final OnGroupReorder onReorder;
   final AppFlowyGroupDataDataSource dataSource;
   final BoardPhantomController phantomController;
-  final double groupWidth;
   final AppFlowyBoardHeaderBuilder? headerBuilder;
   final AppFlowyBoardFooterBuilder? footerBuilder;
   final ReorderFlexAction? reorderFlexAction;
@@ -150,7 +148,6 @@ class _AppFlowyBoardGroupState extends State<AppFlowyBoardGroup> {
               dragTargetKeys: widget.dragTargetKeys,
               scrollController: widget.scrollController,
               config: widget.config,
-              groupWidth: widget.groupWidth,
               onDragStarted: (index) {
                 widget.phantomController.groupStartDragging(widget.groupId);
                 widget.onDragStarted?.call(index);
