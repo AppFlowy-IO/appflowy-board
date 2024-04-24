@@ -8,9 +8,8 @@
 - feat: improve scroll threshold and expandDistance by @hyj1204 in [#23](https://github.com/AppFlowy-IO/appflowy-board/pull/23)
 - feat: expand scrolling view horizontally while moving card by @hyj1204 in [#23](https://github.com/AppFlowy-IO/appflowy-board/pull/23)
 - feat: mobile improvement by @hyj1204 in [#21](https://github.com/AppFlowy-IO/appflowy-board/pull/21)
-- feat: mobile improvement by @hyj1204 in [#21](https://github.com/AppFlowy-IO/appflowy-board/pull/21)
 - feat: allow inserting a new group at given index by @richardshiue in [#19](https://github.com/AppFlowy-IO/appflowy-board/pull/19)
-- chore: fix images from readme by @Xazin in []()
+- chore: fix images from readme by @Xazin in [18](https://github.com/AppFlowy-IO/appflowy-board/pull/18)
 
 # 0.1.1
 
