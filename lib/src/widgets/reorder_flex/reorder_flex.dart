@@ -103,6 +103,7 @@ class ReorderFlex extends StatefulWidget {
     this.reorderFlexAction,
     this.leading,
     this.trailing,
+    this.autoScroll = false,
   }) : assert(
           children.every((Widget w) => w.key != null),
           'All child must have a key.',
@@ -132,6 +133,7 @@ class ReorderFlex extends StatefulWidget {
   final ReorderFlexAction? reorderFlexAction;
   final Widget? leading;
   final Widget? trailing;
+  final bool autoScroll;
 
   @override
   State<ReorderFlex> createState() => ReorderFlexState();
@@ -154,6 +156,10 @@ class ReorderFlexState extends State<ReorderFlex>
   late DragTargetAnimation _animation;
 
   late ReorderFlexNotifier _notifier;
+
+  late ScrollableState _scrollable;
+
+  EdgeDraggingAutoScroller? _autoScroller;
 
   @override
   void initState() {
@@ -187,6 +193,32 @@ class ReorderFlexState extends State<ReorderFlex>
     };
 
     _scrollController = widget.scrollController ?? ScrollController();
+  }
+
+  @override
+  void didChangeDependencies() {
+    _scrollable = Scrollable.of(context);
+    if (_autoScroller?.scrollable != _scrollable && widget.autoScroll) {
+      _autoScroller?.stopAutoScroll();
+      _autoScroller = EdgeDraggingAutoScroller(
+        _scrollable,
+        onScrollViewScrolled: () {
+          final renderBox = draggingState.draggingKey?.currentContext
+              ?.findRenderObject() as RenderBox?;
+          if (renderBox != null) {
+            final offset = renderBox.localToGlobal(Offset.zero);
+            final size = draggingState.feedbackSize!;
+            if (!size.isEmpty) {
+              _autoScroller?.startAutoScrollIfNecessary(
+            offset & size,
+              );
+            }
+          }
+        },
+        velocityScalar: 50,
+      );
+    }
+    super.didChangeDependencies();
   }
 
   @override
@@ -382,12 +414,12 @@ class ReorderFlexState extends State<ReorderFlex>
     Widget child,
     int dragTargetIndex,
     GlobalObjectKey indexKey,
-    bool draggable,
+    bool isDraggable,
   ) {
     final reorderFlexItem = widget.dataSource.items[dragTargetIndex];
     return ReorderDragTarget<FlexDragTargetData>(
       indexGlobalKey: indexKey,
-      draggable: draggable,
+      isDraggable: isDraggable,
       dragTargetData: FlexDragTargetData(
         draggingIndex: dragTargetIndex,
         reorderFlexId: widget.reorderFlexId,
@@ -400,12 +432,20 @@ class ReorderFlexState extends State<ReorderFlex>
         Log.debug(
           "[DragTarget] Group \"${widget.dataSource.identifier}\" start dragging item at index $draggingIndex",
         );
+        draggingState.draggingKey = indexKey;
         _startDragging(draggingWidget, draggingIndex, size);
         widget.onDragStarted?.call(draggingIndex);
         widget.dragStateStorage?.removeState(widget.reorderFlexId);
       },
       onDragMoved: (dragTargetData, offset) {
-        dragTargetData.dragTargetOffset = offset;
+        draggingState.draggingKey = indexKey;
+        final size = dragTargetData.feedbackSize;
+        if (size != null) {
+          draggingState.feedbackSize = size;
+          _autoScroller?.startAutoScrollIfNecessary(
+            offset & size,
+          );
+        }
       },
       onDragEnded: (dragTargetData) {
         if (!mounted) {

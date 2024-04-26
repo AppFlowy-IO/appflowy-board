@@ -239,6 +239,7 @@ class _AppFlowyBoardContentState extends State<_AppFlowyBoardContent> {
               scrollController: widget.scrollController,
               onReorder: widget.onReorder,
               dataSource: widget.boardController,
+              autoScroll: true,
               interceptor: OverlappingDragTargetInterceptor(
                 reorderFlexId: widget.boardController.identifier,
                 acceptedReorderFlexId: widget.boardController.groupIds,
