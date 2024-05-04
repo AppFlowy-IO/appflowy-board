@@ -58,9 +58,7 @@ class ReorderDragTarget<T extends DragTargetData> extends StatefulWidget {
     required this.insertAnimationController,
     required this.deleteAnimationController,
     required this.useMoveAnimation,
-    required this.draggable,
-    required this.scrollController,
-    required this.groupWidth,
+    required this.isDraggable,
     this.onLeave,
     this.draggableTargetBuilder,
     this.draggingOpacity = 0.3,
@@ -90,9 +88,7 @@ class ReorderDragTarget<T extends DragTargetData> extends StatefulWidget {
   final AnimationController insertAnimationController;
   final AnimationController deleteAnimationController;
   final bool useMoveAnimation;
-  final IsDraggable draggable;
-  final ScrollController scrollController;
-  final double groupWidth;
+  final IsDraggable isDraggable;
 
   /// Called when a given piece of data being dragged over this target leaves
   /// the target.
@@ -120,29 +116,6 @@ class _ReorderDragTargetState<T extends DragTargetData>
       onAcceptWithDetails: (details) =>
           widget.onAccceptWithDetails?.call(details.data),
       onMove: (detail) {
-        // Expand the scroll view horizontally when the dragging is near the edge of the scroll view.
-        // It is used to move card to the other group.
-        final scrollController = widget.scrollController;
-        final maxScrollExtent = scrollController.position.maxScrollExtent;
-        final minScrollExtent = scrollController.position.minScrollExtent;
-        const expandDistance = 20;
-
-        if (detail.offset.dx >
-            MediaQuery.of(context).size.width - widget.groupWidth) {
-          final newPosition =
-              scrollController.offset + expandDistance > maxScrollExtent
-                  ? maxScrollExtent
-                  : scrollController.offset + expandDistance;
-          widget.scrollController.jumpTo(newPosition);
-        }
-        if (detail.offset.dx < 20) {
-          final newPosition =
-              scrollController.offset - expandDistance < minScrollExtent
-                  ? minScrollExtent
-                  : scrollController.offset - expandDistance;
-          widget.scrollController.jumpTo(newPosition);
-        }
-
         widget.onDragMoved(detail.data, detail.offset);
       },
       onLeave: (dragTargetData) {
@@ -189,7 +162,7 @@ class _ReorderDragTargetState<T extends DragTargetData>
         // On mobile, we use [LongPressDraggable] to avoid conflicts with scrolling screen behavior. The configuration of [LongPressDraggable] is the same as [Draggable].
         return LongPressDraggable<DragTargetData>(
           axis: widget.dragDirection,
-          maxSimultaneousDrags: widget.draggable ? 1 : 0,
+          maxSimultaneousDrags: widget.isDraggable ? 1 : 0,
           data: widget.dragTargetData,
           ignoringFeedbackSemantics: false,
           feedback: feedbackBuilder,
@@ -221,7 +194,7 @@ class _ReorderDragTargetState<T extends DragTargetData>
       }
       return Draggable<DragTargetData>(
         axis: widget.dragDirection,
-        maxSimultaneousDrags: widget.draggable ? 1 : 0,
+        maxSimultaneousDrags: widget.isDraggable ? 1 : 0,
         data: widget.dragTargetData,
         ignoringFeedbackSemantics: false,
         feedback: feedbackBuilder,

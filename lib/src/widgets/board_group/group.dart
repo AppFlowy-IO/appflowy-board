@@ -68,7 +68,6 @@ class AppFlowyBoardGroup extends StatefulWidget {
     required this.onReorder,
     required this.dataSource,
     required this.phantomController,
-    required this.groupWidth,
     this.headerBuilder,
     this.footerBuilder,
     this.reorderFlexAction,
@@ -88,7 +87,6 @@ class AppFlowyBoardGroup extends StatefulWidget {
   final OnGroupReorder onReorder;
   final AppFlowyGroupDataDataSource dataSource;
   final BoardPhantomController phantomController;
-  final double groupWidth;
   final AppFlowyBoardHeaderBuilder? headerBuilder;
   final AppFlowyBoardFooterBuilder? footerBuilder;
   final ReorderFlexAction? reorderFlexAction;
@@ -144,32 +142,35 @@ class _AppFlowyBoardGroupState extends State<AppFlowyBoardGroup> {
           fit: widget.stretchGroupHeight ? FlexFit.tight : FlexFit.loose,
           child: Padding(
             padding: widget.bodyPadding,
-            child: ReorderFlex(
-              key: ValueKey(widget.groupId),
-              dragStateStorage: widget.dragStateStorage,
-              dragTargetKeys: widget.dragTargetKeys,
-              scrollController: widget.scrollController,
-              config: widget.config,
-              groupWidth: widget.groupWidth,
-              onDragStarted: (index) {
-                widget.phantomController.groupStartDragging(widget.groupId);
-                widget.onDragStarted?.call(index);
-              },
-              onReorder: (fromIndex, toIndex) {
-                if (widget.phantomController.shouldReorder(widget.groupId)) {
-                  widget.onReorder(widget.groupId, fromIndex, toIndex);
-                  widget.phantomController.updateIndex(fromIndex, toIndex);
-                }
-              },
-              onDragEnded: () {
-                widget.phantomController.groupEndDragging(widget.groupId);
-                widget.onDragEnded?.call(widget.groupId);
-                widget.dataSource.debugPrint();
-              },
-              dataSource: widget.dataSource,
-              interceptor: interceptor,
-              reorderFlexAction: widget.reorderFlexAction,
-              children: children,
+            child: SingleChildScrollView(
+              scrollDirection: widget.config.direction,
+              controller: widget.scrollController,
+              child: ReorderFlex(
+                key: ValueKey(widget.groupId),
+                dragStateStorage: widget.dragStateStorage,
+                dragTargetKeys: widget.dragTargetKeys,
+                scrollController: widget.scrollController,
+                config: widget.config,
+                onDragStarted: (index) {
+                  widget.phantomController.groupStartDragging(widget.groupId);
+                  widget.onDragStarted?.call(index);
+                },
+                onReorder: (fromIndex, toIndex) {
+                  if (widget.phantomController.shouldReorder(widget.groupId)) {
+                    widget.onReorder(widget.groupId, fromIndex, toIndex);
+                    widget.phantomController.updateIndex(fromIndex, toIndex);
+                  }
+                },
+                onDragEnded: () {
+                  widget.phantomController.groupEndDragging(widget.groupId);
+                  widget.onDragEnded?.call(widget.groupId);
+                  widget.dataSource.debugPrint();
+                },
+                dataSource: widget.dataSource,
+                interceptor: interceptor,
+                reorderFlexAction: widget.reorderFlexAction,
+                children: children,
+              ),
             ),
           ),
         );

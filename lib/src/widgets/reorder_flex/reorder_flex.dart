@@ -95,7 +95,6 @@ class ReorderFlex extends StatefulWidget {
     required this.children,
     required this.config,
     required this.onReorder,
-    required this.groupWidth,
     this.dragStateStorage,
     this.dragTargetKeys,
     this.onDragStarted,
@@ -104,6 +103,7 @@ class ReorderFlex extends StatefulWidget {
     this.reorderFlexAction,
     this.leading,
     this.trailing,
+    this.autoScroll = false,
   }) : assert(
           children.every((Widget w) => w.key != null),
           'All child must have a key.',
@@ -115,8 +115,6 @@ class ReorderFlex extends StatefulWidget {
 
   /// [onReorder] is called when dragTarget did end dragging
   final OnReorder onReorder;
-
-  final double groupWidth;
 
   /// Save the [DraggingState] if the current [ReorderFlex] get reinitialize.
   final DraggingStateStorage? dragStateStorage;
@@ -135,6 +133,7 @@ class ReorderFlex extends StatefulWidget {
   final ReorderFlexAction? reorderFlexAction;
   final Widget? leading;
   final Widget? trailing;
+  final bool autoScroll;
 
   @override
   State<ReorderFlex> createState() => ReorderFlexState();
@@ -147,9 +146,6 @@ class ReorderFlexState extends State<ReorderFlex>
   /// Controls scrolls and measures scroll progress.
   late ScrollController _scrollController;
 
-  /// Records the position of the [Scrollable]
-  ScrollPosition? _attachedScrollPosition;
-
   /// Whether or not we are currently scrolling this view to show a widget.
   bool _scrolling = false;
 
@@ -160,6 +156,10 @@ class ReorderFlexState extends State<ReorderFlex>
   late DragTargetAnimation _animation;
 
   late ReorderFlexNotifier _notifier;
+
+  late ScrollableState _scrollable;
+
+  EdgeDraggingAutoScroller? _autoScroller;
 
   @override
   void initState() {
@@ -191,27 +191,32 @@ class ReorderFlexState extends State<ReorderFlex>
     widget.reorderFlexAction?._resetDragTargetIndex = (index) {
       resetDragTargetIndex(index);
     };
+
+    _scrollController = widget.scrollController ?? ScrollController();
   }
 
   @override
   void didChangeDependencies() {
-    if (_attachedScrollPosition != null) {
-      _scrollController.detach(_attachedScrollPosition!);
-      _attachedScrollPosition = null;
-    }
-
-    _scrollController = widget.scrollController ??
-        PrimaryScrollController.maybeOf(context) ??
-        ScrollController();
-
-    if (_scrollController.hasClients) {
-      _attachedScrollPosition = Scrollable.maybeOf(context)?.position;
-    } else {
-      _attachedScrollPosition = null;
-    }
-
-    if (_attachedScrollPosition != null) {
-      _scrollController.attach(_attachedScrollPosition!);
+    _scrollable = Scrollable.of(context);
+    if (_autoScroller?.scrollable != _scrollable && widget.autoScroll) {
+      _autoScroller?.stopAutoScroll();
+      _autoScroller = EdgeDraggingAutoScroller(
+        _scrollable,
+        onScrollViewScrolled: () {
+          final renderBox = draggingState.draggingKey?.currentContext
+              ?.findRenderObject() as RenderBox?;
+          if (renderBox != null) {
+            final offset = renderBox.localToGlobal(Offset.zero);
+            final size = draggingState.feedbackSize!;
+            if (!size.isEmpty) {
+              _autoScroller?.startAutoScrollIfNecessary(
+            offset & size,
+              );
+            }
+          }
+        },
+        velocityScalar: 50,
+      );
     }
     super.didChangeDependencies();
   }
@@ -220,7 +225,7 @@ class ReorderFlexState extends State<ReorderFlex>
   Widget build(BuildContext context) {
     final List<Widget> children = [];
 
-    for (int i = 0; i < widget.children.length; i += 1) {
+    for (int i = 0; i < widget.children.length; i++) {
       final Widget child = widget.children[i];
       final ReoderFlexItem item = widget.dataSource.items[i];
 
@@ -235,17 +240,11 @@ class ReorderFlexState extends State<ReorderFlex>
       children.add(_wrap(child, i, indexKey, item.draggable));
     }
 
-    final child = _wrapContainer(children);
-    return _wrapScrollView(child: child);
+    return _wrapContainer(children);
   }
 
   @override
   void dispose() {
-    if (_attachedScrollPosition != null) {
-      _scrollController.detach(_attachedScrollPosition!);
-      _attachedScrollPosition = null;
-    }
-
     _animation.dispose();
     super.dispose();
   }
@@ -415,13 +414,12 @@ class ReorderFlexState extends State<ReorderFlex>
     Widget child,
     int dragTargetIndex,
     GlobalObjectKey indexKey,
-    bool draggable,
+    bool isDraggable,
   ) {
     final reorderFlexItem = widget.dataSource.items[dragTargetIndex];
     return ReorderDragTarget<FlexDragTargetData>(
-      scrollController: _scrollController,
       indexGlobalKey: indexKey,
-      draggable: draggable,
+      isDraggable: isDraggable,
       dragTargetData: FlexDragTargetData(
         draggingIndex: dragTargetIndex,
         reorderFlexId: widget.reorderFlexId,
@@ -430,17 +428,24 @@ class ReorderFlexState extends State<ReorderFlex>
         dragTargetId: reorderFlexItem.id,
         dragTargetIndexKey: indexKey,
       ),
-      groupWidth: widget.groupWidth,
       onDragStarted: (draggingWidget, draggingIndex, size) {
         Log.debug(
           "[DragTarget] Group \"${widget.dataSource.identifier}\" start dragging item at index $draggingIndex",
         );
+        draggingState.draggingKey = indexKey;
         _startDragging(draggingWidget, draggingIndex, size);
         widget.onDragStarted?.call(draggingIndex);
         widget.dragStateStorage?.removeState(widget.reorderFlexId);
       },
       onDragMoved: (dragTargetData, offset) {
-        dragTargetData.dragTargetOffset = offset;
+        draggingState.draggingKey = indexKey;
+        final size = dragTargetData.feedbackSize;
+        if (size != null) {
+          draggingState.feedbackSize = size;
+          _autoScroller?.startAutoScrollIfNecessary(
+            offset & size,
+          );
+        }
       },
       onDragEnded: (dragTargetData) {
         if (!mounted) {
@@ -607,21 +612,6 @@ class ReorderFlexState extends State<ReorderFlex>
     }
 
     _animation.reverseAnimation();
-  }
-
-  Widget _wrapScrollView({required Widget child}) {
-    if (PrimaryScrollController.maybeOf(context) == null) {
-      return child;
-    } else {
-      return ScrollConfiguration(
-        behavior: ScrollConfiguration.of(context).copyWith(scrollbars: true),
-        child: SingleChildScrollView(
-          scrollDirection: widget.config.direction,
-          controller: _scrollController,
-          child: child,
-        ),
-      );
-    }
   }
 
   Widget _wrapContainer(List<Widget> children) {

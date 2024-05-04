@@ -82,6 +82,8 @@ class DraggingState {
   /// The last computed size of the feedback widget being dragged.
   Size? feedbackSize = Size.zero;
 
+  GlobalObjectKey? draggingKey;
+
   /// The location that the dragging widget occupied before it started to drag.
   int dragStartIndex = -1;
 
