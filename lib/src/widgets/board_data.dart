@@ -31,6 +31,11 @@ typedef OnMoveGroupItemToGroup = void Function(
   int toIndex,
 );
 
+typedef OnStartDraggingCard = void Function(
+  String groupId,
+  int index,
+);
+
 /// A controller for [AppFlowyBoard] widget.
 ///
 /// A [AppFlowyBoardController] can be used to provide an initial value of
@@ -54,6 +59,7 @@ class AppFlowyBoardController extends ChangeNotifier
     this.onMoveGroup,
     this.onMoveGroupItem,
     this.onMoveGroupItemToGroup,
+    this.onStartDraggingCard,
   });
 
   final List<AppFlowyGroupData> _groupDatas = [];
@@ -67,7 +73,9 @@ class AppFlowyBoardController extends ChangeNotifier
 
   /// [onMoveGroupItemToGroup] will get called when moving the group's item from
   /// one group to another group.
-  final OnMoveGroupItemToGroup? onMoveGroupItemToGroup;
+  final OnMoveGroupItemToGroup? onMoveGroupItemToGroup; 
+
+  final OnStartDraggingCard? onStartDraggingCard;
 
   /// Returns the unmodifiable list of [AppFlowyGroupData]
   UnmodifiableListView<AppFlowyGroupData> get groupDatas =>
