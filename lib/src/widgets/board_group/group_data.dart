@@ -177,12 +177,11 @@ class AppFlowyGroupController extends ChangeNotifier with EquatableMixin {
   }
 
   void enableDragging(bool isEnable) {
-    groupData.draggable = isEnable;
+    groupData.draggable.value = isEnable;
 
     for (final item in groupData._items) {
-      item.draggable = isEnable;
+      item.draggable.value = isEnable;
     }
-    _notify();
   }
 
   void _notify() {

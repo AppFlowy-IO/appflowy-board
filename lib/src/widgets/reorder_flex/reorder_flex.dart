@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 
 import '../../utils/log.dart';
 
@@ -28,7 +29,7 @@ abstract class ReoderFlexItem {
   /// [id] is used to identify the item. It must be unique.
   String get id;
 
-  bool draggable = true;
+  ValueNotifier<bool> draggable = ValueNotifier(true);
 }
 
 /// Cache each dragTarget's key.
@@ -210,7 +211,7 @@ class ReorderFlexState extends State<ReorderFlex>
             final size = draggingState.feedbackSize!;
             if (!size.isEmpty) {
               _autoScroller?.startAutoScrollIfNecessary(
-            offset & size,
+                offset & size,
               );
             }
           }
@@ -272,7 +273,7 @@ class ReorderFlexState extends State<ReorderFlex>
     Widget child,
     int childIndex,
     GlobalObjectKey indexKey,
-    bool draggable,
+    ValueNotifier<bool> isDraggable,
   ) {
     return Builder(
       builder: (context) {
@@ -281,7 +282,7 @@ class ReorderFlexState extends State<ReorderFlex>
           child,
           childIndex,
           indexKey,
-          draggable,
+          isDraggable,
         );
         int shiftedIndex = childIndex;
 
@@ -414,7 +415,7 @@ class ReorderFlexState extends State<ReorderFlex>
     Widget child,
     int dragTargetIndex,
     GlobalObjectKey indexKey,
-    bool isDraggable,
+    ValueNotifier<bool> isDraggable,
   ) {
     final reorderFlexItem = widget.dataSource.items[dragTargetIndex];
     return ReorderDragTarget<FlexDragTargetData>(
