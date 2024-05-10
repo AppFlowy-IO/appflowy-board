@@ -73,7 +73,7 @@ class AppFlowyBoardController extends ChangeNotifier
 
   /// [onMoveGroupItemToGroup] will get called when moving the group's item from
   /// one group to another group.
-  final OnMoveGroupItemToGroup? onMoveGroupItemToGroup; 
+  final OnMoveGroupItemToGroup? onMoveGroupItemToGroup;
 
   final OnStartDraggingCard? onStartDraggingCard;
 
@@ -240,8 +240,6 @@ class AppFlowyBoardController extends ChangeNotifier
     for (final groupController in _groupControllers.values) {
       groupController.enableDragging(isEnable);
     }
-
-    notifyListeners();
   }
 
   /// Moves the item at [fromGroupIndex] in group with id [fromGroupId] to

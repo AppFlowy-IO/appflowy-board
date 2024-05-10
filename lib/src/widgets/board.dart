@@ -301,7 +301,8 @@ class _AppFlowyBoardContentState extends State<_AppFlowyBoardContent> {
                 reorderFlexAction: reorderFlexAction,
                 stretchGroupHeight: widget.config.stretchGroupHeight,
                 onDragStarted: (index) {
-                  widget.boardController.onStartDraggingCard?.call(columnData.id, index);
+                  widget.boardController.onStartDraggingCard
+                      ?.call(columnData.id, index);
                 },
               ),
             ),
