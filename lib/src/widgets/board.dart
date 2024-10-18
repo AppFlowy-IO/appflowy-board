@@ -231,24 +231,28 @@ class _AppFlowyBoardContentState extends State<_AppFlowyBoardContent> {
               ),
               child: widget.background,
             ),
-          SingleChildScrollView(
-            scrollDirection: widget.reorderFlexConfig.direction,
-            controller: widget.scrollController,
-            child: ReorderFlex(
-              config: widget.reorderFlexConfig,
-              scrollController: widget.scrollController,
-              onReorder: widget.onReorder,
-              dataSource: widget.boardController,
-              autoScroll: true,
-              interceptor: OverlappingDragTargetInterceptor(
-                reorderFlexId: widget.boardController.identifier,
-                acceptedReorderFlexId: widget.boardController.groupIds,
-                delegate: widget.delegate,
-                columnsState: widget.boardState,
+          ScrollConfiguration(
+            behavior:
+                ScrollConfiguration.of(context).copyWith(scrollbars: true),
+            child: SingleChildScrollView(
+              scrollDirection: widget.reorderFlexConfig.direction,
+              controller: widget.scrollController,
+              child: ReorderFlex(
+                config: widget.reorderFlexConfig,
+                scrollController: widget.scrollController,
+                onReorder: widget.onReorder,
+                dataSource: widget.boardController,
+                autoScroll: true,
+                interceptor: OverlappingDragTargetInterceptor(
+                  reorderFlexId: widget.boardController.identifier,
+                  acceptedReorderFlexId: widget.boardController.groupIds,
+                  delegate: widget.delegate,
+                  columnsState: widget.boardState,
+                ),
+                leading: widget.leading,
+                trailing: widget.trailing,
+                children: _buildColumns(),
               ),
-              leading: widget.leading,
-              trailing: widget.trailing,
-              children: _buildColumns(),
             ),
           ),
         ],
