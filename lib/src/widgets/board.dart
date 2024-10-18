@@ -215,6 +215,7 @@ class _AppFlowyBoardContentState extends State<_AppFlowyBoardContent> {
   final GlobalKey _boardContentKey =
       GlobalKey(debugLabel: '$_AppFlowyBoardContent overlay key');
   late BoardOverlayEntry _overlayEntry;
+  late final _scrollController = widget.scrollController ?? ScrollController();
 
   @override
   void initState() {
@@ -231,15 +232,15 @@ class _AppFlowyBoardContentState extends State<_AppFlowyBoardContent> {
               ),
               child: widget.background,
             ),
-          ScrollConfiguration(
-            behavior:
-                ScrollConfiguration.of(context).copyWith(scrollbars: true),
+          Scrollbar(
+            controller: _scrollController,
+            thumbVisibility: true,
             child: SingleChildScrollView(
               scrollDirection: widget.reorderFlexConfig.direction,
-              controller: widget.scrollController,
+              controller: _scrollController,
               child: ReorderFlex(
                 config: widget.reorderFlexConfig,
-                scrollController: widget.scrollController,
+                scrollController: _scrollController,
                 onReorder: widget.onReorder,
                 dataSource: widget.boardController,
                 autoScroll: true,
