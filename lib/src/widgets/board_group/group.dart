@@ -1,15 +1,13 @@
 import 'dart:collection';
 
-import 'package:flutter/material.dart';
-
 import 'package:appflowy_board/src/widgets/reorder_flex/drag_state.dart';
+import 'package:flutter/material.dart';
 
 import '../../rendering/board_overlay.dart';
 import '../../utils/log.dart';
 import '../reorder_flex/drag_target_interceptor.dart';
 import '../reorder_flex/reorder_flex.dart';
 import '../reorder_phantom/phantom_controller.dart';
-
 import 'group_data.dart';
 
 typedef OnGroupDragStarted = void Function(int index);
@@ -81,6 +79,7 @@ class AppFlowyBoardGroup extends StatefulWidget {
     this.cornerRadius = 0.0,
     this.backgroundColor = Colors.transparent,
     this.stretchGroupHeight = true,
+    this.shrinkWrap = false,
   }) : config = const ReorderFlexConfig();
 
   final AppFlowyBoardCardBuilder cardBuilder;
@@ -102,6 +101,7 @@ class AppFlowyBoardGroup extends StatefulWidget {
   final double cornerRadius;
   final Color backgroundColor;
   final bool stretchGroupHeight;
+  final bool shrinkWrap;
   final ReorderFlexConfig config;
 
   String get groupId => dataSource.groupData.id;
@@ -138,42 +138,52 @@ class _AppFlowyBoardGroupState extends State<AppFlowyBoardGroup> {
           draggableTargetBuilder: PhantomDraggableBuilder(),
         );
 
-        final reorderFlex = Flexible(
-          fit: widget.stretchGroupHeight ? FlexFit.tight : FlexFit.loose,
-          child: Padding(
-            padding: widget.bodyPadding,
-            child: SingleChildScrollView(
-              scrollDirection: widget.config.direction,
-              controller: widget.scrollController,
-              child: ReorderFlex(
-                key: ValueKey(widget.groupId),
-                dragStateStorage: widget.dragStateStorage,
-                dragTargetKeys: widget.dragTargetKeys,
-                scrollController: widget.scrollController,
-                config: widget.config,
-                onDragStarted: (index) {
-                  widget.phantomController.groupStartDragging(widget.groupId);
-                  widget.onDragStarted?.call(index);
-                },
-                onReorder: (fromIndex, toIndex) {
-                  if (widget.phantomController.shouldReorder(widget.groupId)) {
-                    widget.onReorder(widget.groupId, fromIndex, toIndex);
-                    widget.phantomController.updateIndex(fromIndex, toIndex);
-                  }
-                },
-                onDragEnded: () {
-                  widget.phantomController.groupEndDragging(widget.groupId);
-                  widget.onDragEnded?.call(widget.groupId);
-                  widget.dataSource.debugPrint();
-                },
-                dataSource: widget.dataSource,
-                interceptor: interceptor,
-                reorderFlexAction: widget.reorderFlexAction,
-                children: children,
-              ),
+        final paddingWidget = Padding(
+          padding: widget.bodyPadding,
+          child: SingleChildScrollView(
+            scrollDirection: widget.config.direction,
+            controller: widget.scrollController,
+            child: ReorderFlex(
+              key: ValueKey(widget.groupId),
+              dragStateStorage: widget.dragStateStorage,
+              dragTargetKeys: widget.dragTargetKeys,
+              scrollController: widget.scrollController,
+              config: widget.config,
+              onDragStarted: (index) {
+                widget.phantomController.groupStartDragging(widget.groupId);
+                widget.onDragStarted?.call(index);
+              },
+              onReorder: (fromIndex, toIndex) {
+                if (widget.phantomController.shouldReorder(widget.groupId)) {
+                  widget.onReorder(widget.groupId, fromIndex, toIndex);
+                  widget.phantomController.updateIndex(fromIndex, toIndex);
+                }
+              },
+              onDragEnded: () {
+                widget.phantomController.groupEndDragging(widget.groupId);
+                widget.onDragEnded?.call(widget.groupId);
+                widget.dataSource.debugPrint();
+              },
+              dataSource: widget.dataSource,
+              interceptor: interceptor,
+              reorderFlexAction: widget.reorderFlexAction,
+              children: children,
             ),
           ),
         );
+
+        final reorderWidget = widget.shrinkWrap
+            ? paddingWidget
+            : Flexible(
+                fit: widget.stretchGroupHeight ? FlexFit.tight : FlexFit.loose,
+                child: paddingWidget,
+              );
+
+        final childrenWidgets = [
+          if (header != null) header,
+          reorderWidget,
+          if (footer != null) footer,
+        ];
 
         return Container(
           margin: widget.margin,
@@ -182,15 +192,16 @@ class _AppFlowyBoardGroupState extends State<AppFlowyBoardGroup> {
             color: widget.backgroundColor,
             borderRadius: BorderRadius.circular(widget.cornerRadius),
           ),
-          child: Flex(
-            direction: Axis.vertical,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (header != null) header,
-              reorderFlex,
-              if (footer != null) footer,
-            ],
-          ),
+          child: widget.shrinkWrap
+              ? Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: childrenWidgets,
+                )
+              : Flex(
+                  direction: Axis.vertical,
+                  mainAxisSize: MainAxisSize.min,
+                  children: childrenWidgets,
+                ),
         );
       },
     );
