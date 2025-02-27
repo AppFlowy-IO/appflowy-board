@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-
 import 'package:provider/provider.dart';
 
 import '../rendering/board_overlay.dart';
 import '../utils/log.dart';
-
 import 'board_data.dart';
 import 'board_group/group.dart';
 import 'board_group/group_data.dart';
@@ -67,6 +65,7 @@ class AppFlowyBoard extends StatelessWidget {
     this.boardScrollController,
     this.leading,
     this.trailing,
+    this.shrinkWrap = false,
   });
 
   /// A controller for [AppFlowyBoard] widget.
@@ -114,7 +113,6 @@ class AppFlowyBoard extends StatelessWidget {
   /// If the primary scrollController is null, we will assign a new [ScrollController].
   final ScrollController? scrollController;
 
-  ///
   final AppFlowyBoardConfig config;
 
   /// A controller is used to control each group scroll actions.
@@ -128,6 +126,9 @@ class AppFlowyBoard extends StatelessWidget {
   /// A widget that is shown after the last group in the Board
   ///
   final Widget? trailing;
+
+  /// if [shrinkWrap] is true, the height of board will be dynamic
+  final bool shrinkWrap;
 
   @override
   Widget build(BuildContext context) {
@@ -161,6 +162,7 @@ class AppFlowyBoard extends StatelessWidget {
             onReorder: controller.moveGroup,
             leading: leading,
             trailing: trailing,
+            shrinkWrap: shrinkWrap,
           );
         },
       ),
@@ -181,6 +183,7 @@ class _AppFlowyBoardContent extends StatefulWidget {
     required this.phantomController,
     this.leading,
     this.trailing,
+    this.shrinkWrap = false,
     this.scrollController,
     this.background,
     this.headerBuilder,
@@ -203,6 +206,7 @@ class _AppFlowyBoardContent extends StatefulWidget {
   final Widget? trailing;
   final ScrollController? scrollController;
   final Widget? background;
+  final bool shrinkWrap;
   final AppFlowyBoardHeaderBuilder? headerBuilder;
   final AppFlowyBoardFooterBuilder? footerBuilder;
   final ReorderFlexConfig reorderFlexConfig;
@@ -221,43 +225,45 @@ class _AppFlowyBoardContentState extends State<_AppFlowyBoardContent> {
   void initState() {
     super.initState();
     _overlayEntry = BoardOverlayEntry(
-      builder: (context) => Stack(
-        children: [
-          if (widget.background != null)
-            Container(
-              clipBehavior: Clip.hardEdge,
-              decoration: BoxDecoration(
-                borderRadius:
-                    BorderRadius.circular(widget.config.boardCornerRadius),
-              ),
-              child: widget.background,
-            ),
-          Scrollbar(
-            controller: _scrollController,
-            thumbVisibility: true,
-            child: SingleChildScrollView(
-              scrollDirection: widget.reorderFlexConfig.direction,
-              controller: _scrollController,
-              child: ReorderFlex(
-                config: widget.reorderFlexConfig,
-                scrollController: _scrollController,
-                onReorder: widget.onReorder,
-                dataSource: widget.boardController,
-                autoScroll: true,
-                interceptor: OverlappingDragTargetInterceptor(
-                  reorderFlexId: widget.boardController.identifier,
-                  acceptedReorderFlexId: widget.boardController.groupIds,
-                  delegate: widget.delegate,
-                  columnsState: widget.boardState,
+      builder: (context) {
+        return Stack(
+          children: [
+            if (widget.background != null)
+              Container(
+                clipBehavior: Clip.hardEdge,
+                decoration: BoxDecoration(
+                  borderRadius:
+                      BorderRadius.circular(widget.config.boardCornerRadius),
                 ),
-                leading: widget.leading,
-                trailing: widget.trailing,
-                children: _buildColumns(),
+                child: widget.background,
               ),
-            ),
-          ),
-        ],
-      ),
+            Scrollbar(
+              controller: _scrollController,
+              thumbVisibility: true,
+              child: SingleChildScrollView(
+                scrollDirection: widget.reorderFlexConfig.direction,
+                controller: _scrollController,
+                child: ReorderFlex(
+                  config: widget.reorderFlexConfig,
+                  scrollController: _scrollController,
+                  onReorder: widget.onReorder,
+                  dataSource: widget.boardController,
+                  autoScroll: true,
+                  interceptor: OverlappingDragTargetInterceptor(
+                    reorderFlexId: widget.boardController.identifier,
+                    acceptedReorderFlexId: widget.boardController.groupIds,
+                    delegate: widget.delegate,
+                    columnsState: widget.boardState,
+                  ),
+                  leading: widget.leading,
+                  trailing: widget.trailing,
+                  children: _buildColumns(),
+                ),
+              ),
+            )
+          ],
+        );
+      },
     );
   }
 
@@ -297,6 +303,7 @@ class _AppFlowyBoardContentState extends State<_AppFlowyBoardContent> {
                 cardBuilder: widget.cardBuilder,
                 dataSource: dataSource,
                 scrollController: ScrollController(),
+                shrinkWrap: widget.shrinkWrap,
                 phantomController: widget.phantomController,
                 onReorder: widget.boardController.moveGroupItem,
                 cornerRadius: widget.config.groupCornerRadius,

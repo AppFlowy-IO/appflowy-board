@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'multi_board_list_example.dart';
+import 'multi_board_shrinkwrap_list_example.dart';
 import 'single_board_list_example.dart';
 
 void main() {
@@ -20,6 +21,7 @@ class _MyAppState extends State<MyApp> {
 
   final List<Widget> _examples = [
     const MultiBoardListExample(),
+    const MultiBoardShrinkwrapListExample(),
     const SingleBoardListExample(),
   ];
 
@@ -40,6 +42,9 @@ class _MyAppState extends State<MyApp> {
               BottomNavigationBarItem(
                   icon: Icon(Icons.grid_on, color: _bottomNavigationColor),
                   label: "MultiColumn"),
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.grid_on, color: _bottomNavigationColor),
+                  label: "MultiShrinkwrapColumn "),
               BottomNavigationBarItem(
                   icon: Icon(Icons.grid_on, color: _bottomNavigationColor),
                   label: "SingleColumn"),

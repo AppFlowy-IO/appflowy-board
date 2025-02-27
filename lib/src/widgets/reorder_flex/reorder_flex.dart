@@ -6,7 +6,6 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../utils/log.dart';
-
 import 'drag_state.dart';
 import 'drag_target.dart';
 import 'drag_target_interceptor.dart';
@@ -53,10 +52,12 @@ abstract class ReorderDragTargetKeys {
 
 abstract class ReorderFlexAction {
   void Function(void Function(BuildContext)?)? _scrollToBottom;
+
   void Function(void Function(BuildContext)?) get scrollToBottom =>
       _scrollToBottom!;
 
   void Function(int)? _resetDragTargetIndex;
+
   void Function(int) get resetDragTargetIndex => _resetDragTargetIndex!;
 }
 
@@ -65,6 +66,7 @@ class ReorderFlexConfig {
     this.useMoveAnimation = true,
     this.direction = Axis.vertical,
     this.dragDirection,
+    this.shrinkWrap = false,
   }) : useMovePlaceholder = !useMoveAnimation;
 
   final bool useMoveAnimation;
@@ -86,6 +88,8 @@ class ReorderFlexConfig {
   final Duration scrollAnimationDuration = const Duration(milliseconds: 200);
 
   final bool useMovePlaceholder;
+
+  final bool shrinkWrap;
 }
 
 class ReorderFlex extends StatefulWidget {
@@ -158,7 +162,7 @@ class ReorderFlexState extends State<ReorderFlex>
 
   late ReorderFlexNotifier _notifier;
 
-  late ScrollableState _scrollable;
+  ScrollableState? _scrollable;
 
   EdgeDraggingAutoScroller? _autoScroller;
 
@@ -198,11 +202,13 @@ class ReorderFlexState extends State<ReorderFlex>
 
   @override
   void didChangeDependencies() {
-    _scrollable = Scrollable.of(context);
-    if (_autoScroller?.scrollable != _scrollable && widget.autoScroll) {
+    _scrollable = Scrollable.maybeOf(context);
+    if (_scrollable != null &&
+        _autoScroller?.scrollable != _scrollable &&
+        widget.autoScroll) {
       _autoScroller?.stopAutoScroll();
       _autoScroller = EdgeDraggingAutoScroller(
-        _scrollable,
+        _scrollable!,
         onScrollViewScrolled: () {
           final renderBox = draggingState.draggingKey?.currentContext
               ?.findRenderObject() as RenderBox?;
