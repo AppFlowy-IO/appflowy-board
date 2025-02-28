@@ -239,7 +239,6 @@ class _AppFlowyBoardContentState extends State<_AppFlowyBoardContent> {
               ),
             Scrollbar(
               controller: _scrollController,
-              thumbVisibility: true,
               child: SingleChildScrollView(
                 scrollDirection: widget.reorderFlexConfig.direction,
                 controller: _scrollController,
