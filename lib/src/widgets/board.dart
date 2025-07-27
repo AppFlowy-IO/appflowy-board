@@ -306,7 +306,7 @@ class _AppFlowyBoardContentState extends State<_AppFlowyBoardContent> {
                 phantomController: widget.phantomController,
                 onReorder: widget.boardController.moveGroupItem,
                 cornerRadius: widget.config.groupCornerRadius,
-                backgroundColor: widget.config.groupBackgroundColor,
+                backgroundColor: dataSource.groupData.backgroundColor ?? widget.config.groupBackgroundColor,
                 dragStateStorage: widget.boardState,
                 dragTargetKeys: widget.boardState,
                 reorderFlexAction: reorderFlexAction,

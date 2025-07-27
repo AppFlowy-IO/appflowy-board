@@ -194,6 +194,7 @@ class AppFlowyGroupData<CustomData> extends ReoderFlexItem with EquatableMixin {
   AppFlowyGroupData({
     required this.id,
     required String name,
+    this.backgroundColor,
     this.customData,
     List<AppFlowyGroupItem> items = const [],
   })  : _items = items,
@@ -206,6 +207,7 @@ class AppFlowyGroupData<CustomData> extends ReoderFlexItem with EquatableMixin {
   final String id;
   AppFlowyGroupHeaderData headerData;
   final CustomData? customData;
+  final Color? backgroundColor;
 
   final List<AppFlowyGroupItem> _items;
 
