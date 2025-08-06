@@ -598,11 +598,31 @@ class ReorderFlexState extends State<ReorderFlex>
         PrimaryScrollController.of(context) == null) {
       return child;
     } else {
-      return SingleChildScrollView(
-        scrollDirection: widget.config.direction,
-        controller: _scrollController,
-        child: child,
-      );
+      if (widget.config.direction == Axis.horizontal) {
+        return SingleChildScrollView(
+          physics: ClampingScrollPhysics(),
+          scrollDirection: widget.config.direction,
+          controller: _scrollController,
+          child: Container(
+            margin: EdgeInsets.only(right: 4),
+            child: child
+          ),
+        );
+      } else {
+        return Scrollbar(
+          controller: _scrollController,
+          thickness: 5,
+          child: SingleChildScrollView(
+            physics: ClampingScrollPhysics(),
+            scrollDirection: widget.config.direction,
+            controller: _scrollController,
+            child: Container(
+              margin: EdgeInsets.only(right: 4),
+              child: child
+            ),
+          )
+        );
+      }
     }
   }
 

@@ -13,31 +13,25 @@ typedef OnGroupDragStarted = void Function(int index);
 
 typedef OnGroupDragEnded = void Function(String groupId);
 
-typedef OnGroupReorder = void Function(
-  String groupId,
-  int fromIndex,
-  int toIndex,
-);
+typedef OnGroupReorder =
+    void Function(String groupId, int fromIndex, int toIndex);
 
 typedef OnGroupDeleted = void Function(String groupId, int deletedIndex);
 
 typedef OnGroupInserted = void Function(String groupId, int insertedIndex);
 
-typedef AppFlowyBoardCardBuilder = Widget Function(
-  BuildContext context,
-  AppFlowyGroupData groupData,
-  AppFlowyGroupItem item,
-);
+typedef AppFlowyBoardCardBuilder =
+    Widget Function(
+      BuildContext context,
+      AppFlowyGroupData groupData,
+      AppFlowyGroupItem item,
+    );
 
-typedef AppFlowyBoardHeaderBuilder = Widget? Function(
-  BuildContext context,
-  AppFlowyGroupData groupData,
-);
+typedef AppFlowyBoardHeaderBuilder =
+    Widget? Function(BuildContext context, AppFlowyGroupData groupData);
 
-typedef AppFlowyBoardFooterBuilder = Widget Function(
-  BuildContext context,
-  AppFlowyGroupData groupData,
-);
+typedef AppFlowyBoardFooterBuilder =
+    Widget Function(BuildContext context, AppFlowyGroupData groupData);
 
 abstract class AppFlowyGroupDataDataSource extends ReoderFlexDataSource {
   AppFlowyGroupData get groupData;
@@ -115,31 +109,37 @@ class AppFlowyBoardGroup extends StatefulWidget {
     this.cornerRadius = 0.0,
     this.backgroundColor = Colors.transparent,
     this.stretchGroupHeight = true,
-  })  : config = const ReorderFlexConfig(),
-        super(key: key);
+  }) : config = const ReorderFlexConfig(),
+       super(key: key);
 
   @override
   State<AppFlowyBoardGroup> createState() => _AppFlowyBoardGroupState();
 }
 
 class _AppFlowyBoardGroupState extends State<AppFlowyBoardGroup> {
-  final GlobalKey _columnOverlayKey =
-      GlobalKey(debugLabel: '$AppFlowyBoardGroup overlay key');
+  final GlobalKey _columnOverlayKey = GlobalKey(
+    debugLabel: '$AppFlowyBoardGroup overlay key',
+  );
   late BoardOverlayEntry _overlayEntry;
 
   @override
   void initState() {
     _overlayEntry = BoardOverlayEntry(
       builder: (BuildContext context) {
-        final children = widget.dataSource.groupData.items
-            .map((item) => _buildWidget(context, item))
-            .toList();
+        final children =
+            widget.dataSource.groupData.items
+                .map((item) => _buildWidget(context, item))
+                .toList();
 
-        final header =
-            widget.headerBuilder?.call(context, widget.dataSource.groupData);
+        final header = widget.headerBuilder?.call(
+          context,
+          widget.dataSource.groupData,
+        );
 
-        final footer =
-            widget.footerBuilder?.call(context, widget.dataSource.groupData);
+        final footer = widget.footerBuilder?.call(
+          context,
+          widget.dataSource.groupData,
+        );
 
         final interceptor = CrossReorderFlexDragTargetInterceptor(
           reorderFlexId: widget.groupId,
@@ -205,9 +205,11 @@ class _AppFlowyBoardGroupState extends State<AppFlowyBoardGroup> {
 
   @override
   Widget build(BuildContext context) {
-    return BoardOverlay(
-      key: _columnOverlayKey,
-      initialEntries: [_overlayEntry],
+    return Container(
+      child: BoardOverlay(
+        key: _columnOverlayKey,
+        initialEntries: [_overlayEntry],
+      ),
     );
   }
 
