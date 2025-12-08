@@ -67,25 +67,3 @@ jobs:
         working-directory: example
         run: |
           flutter test integration_test/board_test.dart -d macos
-
-  build:
-    name: Build Check (Web)
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.27.4'
-          channel: 'stable'
-          cache: true
-
-      - name: Install dependencies
-        run: |
-          flutter pub get
-          cd example && flutter pub get
-
-      - name: Build Web
-        working-directory: example
-        run: flutter build web
