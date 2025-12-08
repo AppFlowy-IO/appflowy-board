@@ -2,7 +2,7 @@ import 'package:appflowy_board/appflowy_board.dart';
 import 'package:flutter/material.dart';
 
 class MultiBoardShrinkwrapListExample extends StatefulWidget {
-  const MultiBoardShrinkwrapListExample({Key? key}) : super(key: key);
+  const MultiBoardShrinkwrapListExample({super.key});
 
   @override
   State<MultiBoardShrinkwrapListExample> createState() =>
@@ -158,8 +158,8 @@ class RichTextCard extends StatefulWidget {
   final RichTextItem item;
   const RichTextCard({
     required this.item,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<RichTextCard> createState() => _RichTextCardState();

@@ -6,9 +6,9 @@ class StressTestBoard extends StatefulWidget {
   final StressTestConfig config;
 
   const StressTestBoard({
-    Key? key,
+    super.key,
     required this.config,
-  }) : super(key: key);
+  });
 
   @override
   State<StressTestBoard> createState() => StressTestBoardState();

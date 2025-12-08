@@ -5,19 +5,19 @@ import 'package:appflowy_board/src/widgets/board_group/group.dart';
 
 // Test data models
 class TextItem extends AppFlowyGroupItem {
-  final String title;
-
   TextItem(this.title);
+
+  final String title;
 
   @override
   String get id => title;
 }
 
 class RichTextItem extends AppFlowyGroupItem {
+  RichTextItem({required this.title, required this.subtitle});
+
   final String title;
   final String subtitle;
-
-  RichTextItem({required this.title, required this.subtitle});
 
   @override
   String get id => title;
@@ -90,7 +90,7 @@ void main() {
         id: 'group1',
         name: 'Test Group',
         items: [TextItem('Item 1')],
-      ));
+      ),);
 
       await tester.pumpWidget(buildTestBoard(controller: controller));
       await tester.pumpAndSettle();
@@ -105,12 +105,12 @@ void main() {
         id: 'group1',
         name: 'Group 1',
         items: [TextItem('Item A'), TextItem('Item B')],
-      ));
+      ),);
       controller.addGroup(AppFlowyGroupData(
         id: 'group2',
         name: 'Group 2',
         items: [TextItem('Item C'), TextItem('Item D')],
-      ));
+      ),);
 
       await tester.pumpWidget(buildTestBoard(controller: controller));
       await tester.pumpAndSettle();
@@ -127,7 +127,7 @@ void main() {
         id: 'empty_group',
         name: 'Empty Group',
         items: [],
-      ));
+      ),);
 
       await tester.pumpWidget(buildTestBoard(controller: controller));
       await tester.pumpAndSettle();
@@ -141,7 +141,7 @@ void main() {
         id: 'group1',
         name: 'Group 1',
         items: [TextItem('card1'), TextItem('card2')],
-      ));
+      ),);
 
       await tester.pumpWidget(buildTestBoard(controller: controller));
       await tester.pumpAndSettle();
@@ -158,7 +158,7 @@ void main() {
         id: 'group1',
         name: 'Test Group',
         items: [TextItem('Item 1')],
-      ));
+      ),);
 
       await tester.pumpWidget(buildTestBoard(
         controller: controller,
@@ -169,7 +169,7 @@ void main() {
             child: Text('Header: ${groupData.headerData.groupName}'),
           );
         },
-      ));
+      ),);
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('header_group1')), findsOneWidget);
@@ -182,7 +182,7 @@ void main() {
         id: 'group1',
         name: 'Test Group',
         items: [TextItem('Item 1')],
-      ));
+      ),);
 
       await tester.pumpWidget(buildTestBoard(
         controller: controller,
@@ -193,7 +193,7 @@ void main() {
             child: const Text('Add New'),
           );
         },
-      ));
+      ),);
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('footer_group1')), findsOneWidget);
@@ -206,12 +206,12 @@ void main() {
         id: 'group1',
         name: 'Group 1',
         items: [TextItem('Item 1')],
-      ));
+      ),);
       controller.addGroup(AppFlowyGroupData(
         id: 'group2',
         name: 'Group 2',
         items: [TextItem('Item 2')],
-      ));
+      ),);
 
       await tester.pumpWidget(buildTestBoard(
         controller: controller,
@@ -227,7 +227,7 @@ void main() {
             child: Text('Footer ${groupData.id}'),
           );
         },
-      ));
+      ),);
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('header_group1')), findsOneWidget);
@@ -252,7 +252,7 @@ void main() {
         id: 'new_group',
         name: 'New Group',
         items: [TextItem('New Item')],
-      ));
+      ),);
 
       await tester.pumpAndSettle();
 
@@ -265,7 +265,7 @@ void main() {
         id: 'group1',
         name: 'Group 1',
         items: [TextItem('Item 1')],
-      ));
+      ),);
 
       await tester.pumpWidget(buildTestBoard(controller: controller));
       await tester.pumpAndSettle();
@@ -284,7 +284,7 @@ void main() {
         id: 'group1',
         name: 'Group 1',
         items: [TextItem('Item 1')],
-      ));
+      ),);
 
       await tester.pumpWidget(buildTestBoard(controller: controller));
       await tester.pumpAndSettle();
@@ -303,7 +303,7 @@ void main() {
         id: 'group1',
         name: 'Group 1',
         items: [TextItem('Item 1'), TextItem('Item 2')],
-      ));
+      ),);
 
       await tester.pumpWidget(buildTestBoard(controller: controller));
       await tester.pumpAndSettle();
@@ -323,7 +323,7 @@ void main() {
         id: 'group1',
         name: 'Group 1',
         items: [TextItem('First'), TextItem('Last')],
-      ));
+      ),);
 
       await tester.pumpWidget(buildTestBoard(controller: controller));
       await tester.pumpAndSettle();
@@ -342,14 +342,14 @@ void main() {
         id: 'group1',
         name: 'Original Name',
         items: [TextItem('Item 1')],
-      ));
+      ),);
 
       await tester.pumpWidget(buildTestBoard(
         controller: controller,
         headerBuilder: (context, groupData) {
           return Text(groupData.headerData.groupName);
         },
-      ));
+      ),);
       await tester.pumpAndSettle();
 
       expect(find.text('Original Name'), findsOneWidget);
@@ -368,12 +368,12 @@ void main() {
         id: 'group1',
         name: 'Group 1',
         items: [TextItem('Item 1')],
-      ));
+      ),);
 
       await tester.pumpWidget(buildTestBoard(
         controller: controller,
         groupConstraints: const BoxConstraints.tightFor(width: 300),
-      ));
+      ),);
       await tester.pumpAndSettle();
 
       // Board renders with specified constraints
@@ -386,14 +386,14 @@ void main() {
         id: 'group1',
         name: 'Group 1',
         items: [TextItem('Item 1')],
-      ));
+      ),);
 
       await tester.pumpWidget(buildTestBoard(
         controller: controller,
         config: const AppFlowyBoardConfig(
           groupBackgroundColor: Colors.blue,
         ),
-      ));
+      ),);
       await tester.pumpAndSettle();
 
       expect(find.byType(AppFlowyBoard), findsOneWidget);
@@ -405,12 +405,12 @@ void main() {
         id: 'group1',
         name: 'Group 1',
         items: [TextItem('Item 1')],
-      ));
+      ),);
 
       await tester.pumpWidget(buildTestBoard(
         controller: controller,
         shrinkWrap: true,
-      ));
+      ),);
       await tester.pumpAndSettle();
 
       expect(find.byType(AppFlowyBoard), findsOneWidget);
@@ -423,7 +423,7 @@ void main() {
         id: 'group1',
         name: 'Group 1',
         items: [TextItem('Item 1')],
-      ));
+      ),);
 
       await tester.pumpWidget(buildTestBoard(
         controller: controller,
@@ -431,7 +431,7 @@ void main() {
           groupCornerRadius: 16.0,
           boardCornerRadius: 8.0,
         ),
-      ));
+      ),);
       await tester.pumpAndSettle();
 
       expect(find.byType(AppFlowyBoard), findsOneWidget);
@@ -440,57 +440,55 @@ void main() {
 
   group('AppFlowyBoard - Drag and Drop Callbacks', () {
     testWidgets('onMoveGroupItem callback is provided', (tester) async {
-      String? movedGroupId;
-      int? movedFromIndex;
-      int? movedToIndex;
+      bool callbackProvided = false;
 
       final controller = createTestController(
         onMoveGroupItem: (groupId, fromIndex, toIndex) {
-          movedGroupId = groupId;
-          movedFromIndex = fromIndex;
-          movedToIndex = toIndex;
+          callbackProvided = true;
         },
       );
       controller.addGroup(AppFlowyGroupData(
         id: 'group1',
         name: 'Group 1',
         items: [TextItem('Item A'), TextItem('Item B')],
-      ));
+      ),);
 
       await tester.pumpWidget(buildTestBoard(controller: controller));
       await tester.pumpAndSettle();
 
-      // Verify controller is set up correctly
+      // Verify controller is set up correctly with callback
       expect(controller.getGroupController('group1'), isNotNull);
       expect(controller.getGroupController('group1')?.items.length, 2);
+      // callback is provided but not triggered in this test
+      expect(callbackProvided, isFalse);
     });
 
     testWidgets('onMoveGroupItemToGroup callback is provided', (tester) async {
-      String? fromGroup;
-      String? toGroup;
+      bool callbackProvided = false;
 
       final controller = createTestController(
         onMoveGroupItemToGroup: (fromGroupId, fromIndex, toGroupId, toIndex) {
-          fromGroup = fromGroupId;
-          toGroup = toGroupId;
+          callbackProvided = true;
         },
       );
       controller.addGroup(AppFlowyGroupData(
         id: 'group1',
         name: 'Group 1',
         items: [TextItem('Item A')],
-      ));
+      ),);
       controller.addGroup(AppFlowyGroupData(
         id: 'group2',
         name: 'Group 2',
         items: [TextItem('Item B')],
-      ));
+      ),);
 
       await tester.pumpWidget(buildTestBoard(controller: controller));
       await tester.pumpAndSettle();
 
       expect(find.text('Item A'), findsOneWidget);
       expect(find.text('Item B'), findsOneWidget);
+      // callback is provided but not triggered in this test
+      expect(callbackProvided, isFalse);
     });
   });
 
@@ -505,7 +503,7 @@ void main() {
           TextItem('Second'),
           TextItem('Third'),
         ],
-      ));
+      ),);
 
       await tester.pumpWidget(buildTestBoard(controller: controller));
       await tester.pumpAndSettle();
@@ -522,17 +520,17 @@ void main() {
         id: 'group1',
         name: 'First Group',
         items: [],
-      ));
+      ),);
       controller.addGroup(AppFlowyGroupData(
         id: 'group2',
         name: 'Second Group',
         items: [],
-      ));
+      ),);
       controller.addGroup(AppFlowyGroupData(
         id: 'group3',
         name: 'Third Group',
         items: [],
-      ));
+      ),);
 
       await tester.pumpWidget(buildTestBoard(controller: controller));
       await tester.pumpAndSettle();
@@ -549,15 +547,14 @@ void main() {
         id: 'group1',
         name: 'Group 1',
         items: [TextItem('Unique')],
-      ));
+      ),);
 
       await tester.pumpWidget(buildTestBoard(controller: controller));
       await tester.pumpAndSettle();
 
       // Try to add duplicate
-      final result = controller
-          .getGroupController('group1')
-          ?.add(TextItem('Unique'));
+      final result =
+          controller.getGroupController('group1')?.add(TextItem('Unique'));
 
       expect(result, false); // Should not add duplicate
       expect(controller.getGroupController('group1')?.items.length, 1);
@@ -569,12 +566,12 @@ void main() {
         id: 'group1',
         name: 'Group 1',
         items: [TextItem('Item 1')],
-      ));
+      ),);
       controller.addGroup(AppFlowyGroupData(
         id: 'group2',
         name: 'Group 2',
         items: [TextItem('Item 2')],
-      ));
+      ),);
 
       await tester.pumpWidget(buildTestBoard(controller: controller));
       await tester.pumpAndSettle();
@@ -595,7 +592,7 @@ void main() {
         id: 'group1',
         name: 'Group 1',
         items: [],
-      ));
+      ),);
 
       await tester.pumpWidget(buildTestBoard(controller: controller));
       await tester.pumpAndSettle();
@@ -622,7 +619,7 @@ void main() {
         id: '',
         name: 'Empty ID Group',
         items: [TextItem('Item')],
-      ));
+      ),);
 
       await tester.pumpWidget(buildTestBoard(controller: controller));
       await tester.pumpAndSettle();
@@ -641,7 +638,7 @@ void main() {
           TextItem('Item_with_underscores'),
           TextItem('Item.with.dots'),
         ],
-      ));
+      ),);
 
       await tester.pumpWidget(buildTestBoard(controller: controller));
       await tester.pumpAndSettle();
@@ -659,7 +656,7 @@ void main() {
         id: 'group1',
         name: 'Large Group',
         items: items,
-      ));
+      ),);
 
       await tester.pumpWidget(buildTestBoard(controller: controller));
       await tester.pumpAndSettle();
@@ -674,7 +671,7 @@ void main() {
           id: 'group$i',
           name: 'Group $i',
           items: [TextItem('Item in Group $i')],
-        ));
+        ),);
       }
 
       await tester.pumpWidget(buildTestBoard(controller: controller));
@@ -695,7 +692,7 @@ void main() {
           TextItem('Item B'),
           TextItem('Item C'),
         ],
-      ));
+      ),);
 
       await tester.pumpWidget(buildTestBoard(controller: controller));
       await tester.pumpAndSettle();
@@ -721,17 +718,17 @@ void main() {
         id: 'group1',
         name: 'Group 1',
         items: [],
-      ));
+      ),);
       controller.addGroup(AppFlowyGroupData(
         id: 'group2',
         name: 'Group 2',
         items: [],
-      ));
+      ),);
       controller.addGroup(AppFlowyGroupData(
         id: 'group3',
         name: 'Group 3',
         items: [],
-      ));
+      ),);
 
       await tester.pumpWidget(buildTestBoard(controller: controller));
       await tester.pumpAndSettle();
@@ -753,7 +750,7 @@ void main() {
         id: 'group1',
         name: 'Group 1',
         items: [TextItem('Item A'), TextItem('Item B'), TextItem('Item C')],
-      ));
+      ),);
 
       await tester.pumpWidget(buildTestBoard(controller: controller));
       await tester.pumpAndSettle();
@@ -778,7 +775,7 @@ void main() {
         id: 'group1',
         name: 'Group 1',
         items: [TextItem('Item A')],
-      ));
+      ),);
 
       await tester.pumpWidget(buildTestBoard(controller: controller));
       await tester.pumpAndSettle();
@@ -807,12 +804,12 @@ void main() {
         id: 'group1',
         name: 'Group 1',
         items: List.generate(20, (i) => TextItem('Item $i')),
-      ));
+      ),);
 
       await tester.pumpWidget(buildTestBoard(
         controller: controller,
         scrollController: scrollController,
-      ));
+      ),);
       await tester.pumpAndSettle();
 
       // Scroll controller should be connected
@@ -827,7 +824,7 @@ void main() {
         id: 'group1',
         name: 'Group 1',
         items: [TextItem('Original')],
-      ));
+      ),);
 
       await tester.pumpWidget(buildTestBoard(controller: controller));
       await tester.pumpAndSettle();
@@ -847,7 +844,7 @@ void main() {
         id: 'group1',
         name: 'Group 1',
         items: [TextItem('ExistingId')],
-      ));
+      ),);
 
       await tester.pumpWidget(buildTestBoard(controller: controller));
       await tester.pumpAndSettle();
@@ -871,7 +868,7 @@ void main() {
         items: [
           RichTextItem(title: 'Rich Title', subtitle: 'Rich Subtitle'),
         ],
-      ));
+      ),);
 
       await tester.pumpWidget(MaterialApp(
         home: Scaffold(
@@ -893,7 +890,7 @@ void main() {
             },
           ),
         ),
-      ));
+      ),);
       await tester.pumpAndSettle();
 
       expect(find.text('Rich Title'), findsOneWidget);
@@ -909,7 +906,7 @@ void main() {
           TextItem('Simple Text'),
           RichTextItem(title: 'Rich', subtitle: 'Text'),
         ],
-      ));
+      ),);
 
       await tester.pumpWidget(MaterialApp(
         home: Scaffold(
@@ -929,7 +926,7 @@ void main() {
             },
           ),
         ),
-      ));
+      ),);
       await tester.pumpAndSettle();
 
       expect(find.text('Simple: Simple Text'), findsOneWidget);

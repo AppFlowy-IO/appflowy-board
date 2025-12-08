@@ -52,6 +52,7 @@ typedef OnStartDraggingCard = void Function(
 ///
 /// [onMoveGroupItemToGroup] will get called when moving the group's item from
 /// one group to another group.
+// ignore: must_be_immutable
 class AppFlowyBoardController extends ChangeNotifier
     with EquatableMixin
     implements BoardPhantomControllerDelegate, ReoderFlexDataSource {
