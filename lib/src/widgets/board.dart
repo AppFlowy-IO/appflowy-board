@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../rendering/board_overlay.dart';
 import '../utils/log.dart';
 import 'board_data.dart';
 import 'board_group/group.dart';
@@ -33,6 +32,7 @@ class AppFlowyBoardConfig {
     this.groupFooterPadding = const EdgeInsets.symmetric(horizontal: 12),
     this.stretchGroupHeight = true,
     this.cardMargin = const EdgeInsets.symmetric(horizontal: 3, vertical: 4),
+    this.dragAutoScrollVelocity = 30.0,
   });
 
   // board
@@ -49,6 +49,11 @@ class AppFlowyBoardConfig {
 
   // card
   final EdgeInsets cardMargin;
+
+  /// The velocity scalar for auto-scrolling when dragging cards near edges.
+  /// Lower values result in slower scrolling. Default is 30.0.
+  /// Increase this value for faster scrolling, decrease for slower.
+  final double dragAutoScrollVelocity;
 }
 
 class AppFlowyBoard extends StatelessWidget {
@@ -136,29 +141,16 @@ class AppFlowyBoard extends StatelessWidget {
       value: controller,
       child: Consumer<AppFlowyBoardController>(
         builder: (context, notifier, child) {
-          final boardState = AppFlowyBoardState();
-          final phantomController = BoardPhantomController(
-            delegate: controller,
-            groupsState: boardState,
-          );
-
-          if (boardScrollController != null) {
-            boardScrollController!._boardState = boardState;
-          }
-
           return _AppFlowyBoardContent(
             config: config,
             boardController: controller,
             scrollController: scrollController,
             scrollManager: boardScrollController,
-            boardState: boardState,
             background: background,
-            delegate: phantomController,
             groupConstraints: groupConstraints,
             cardBuilder: cardBuilder,
             footerBuilder: footerBuilder,
             headerBuilder: headerBuilder,
-            phantomController: phantomController,
             onReorder: controller.moveGroup,
             leading: leading,
             trailing: trailing,
@@ -171,16 +163,13 @@ class AppFlowyBoard extends StatelessWidget {
 }
 
 class _AppFlowyBoardContent extends StatefulWidget {
-  const _AppFlowyBoardContent({
+  _AppFlowyBoardContent({
     required this.config,
     required this.onReorder,
-    required this.delegate,
     required this.boardController,
     required this.scrollManager,
-    required this.boardState,
     required this.groupConstraints,
     required this.cardBuilder,
-    required this.phantomController,
     this.leading,
     this.trailing,
     this.shrinkWrap = false,
@@ -188,20 +177,18 @@ class _AppFlowyBoardContent extends StatefulWidget {
     this.background,
     this.headerBuilder,
     this.footerBuilder,
-  }) : reorderFlexConfig = const ReorderFlexConfig(
+  }) : reorderFlexConfig = ReorderFlexConfig(
           direction: Axis.horizontal,
           dragDirection: Axis.horizontal,
+          autoScrollVelocityScalar: config.dragAutoScrollVelocity,
         );
 
   final AppFlowyBoardConfig config;
   final OnReorder onReorder;
-  final OverlapDragTargetDelegate delegate;
   final AppFlowyBoardController boardController;
   final AppFlowyBoardScrollController? scrollManager;
-  final AppFlowyBoardState boardState;
   final BoxConstraints groupConstraints;
   final AppFlowyBoardCardBuilder cardBuilder;
-  final BoardPhantomController phantomController;
   final Widget? leading;
   final Widget? trailing;
   final ScrollController? scrollController;
@@ -216,64 +203,101 @@ class _AppFlowyBoardContent extends StatefulWidget {
 }
 
 class _AppFlowyBoardContentState extends State<_AppFlowyBoardContent> {
-  final GlobalKey _boardContentKey =
-      GlobalKey(debugLabel: '$_AppFlowyBoardContent overlay key');
-  late BoardOverlayEntry _overlayEntry;
-  late final _scrollController = widget.scrollController ?? ScrollController();
+  late final _scrollController =
+      widget.scrollController ?? ScrollController();
+  late final AppFlowyBoardState _boardState;
+  late final BoardPhantomController _phantomController;
+  final Map<String, ScrollController> _groupScrollControllers = {};
 
   @override
   void initState() {
     super.initState();
-    _overlayEntry = BoardOverlayEntry(
-      builder: (context) {
-        return Stack(
-          children: [
-            if (widget.background != null)
-              Container(
-                clipBehavior: Clip.hardEdge,
-                decoration: BoxDecoration(
-                  borderRadius:
-                      BorderRadius.circular(widget.config.boardCornerRadius),
-                ),
-                child: widget.background,
-              ),
-            Scrollbar(
-              controller: _scrollController,
-              child: SingleChildScrollView(
-                scrollDirection: widget.reorderFlexConfig.direction,
-                controller: _scrollController,
-                child: ReorderFlex(
-                  config: widget.reorderFlexConfig,
-                  scrollController: _scrollController,
-                  onReorder: widget.onReorder,
-                  dataSource: widget.boardController,
-                  autoScroll: true,
-                  interceptor: OverlappingDragTargetInterceptor(
-                    reorderFlexId: widget.boardController.identifier,
-                    acceptedReorderFlexId: widget.boardController.groupIds,
-                    delegate: widget.delegate,
-                    columnsState: widget.boardState,
-                  ),
-                  leading: widget.leading,
-                  trailing: widget.trailing,
-                  children: _buildColumns(),
-                ),
-              ),
-            )
-          ],
-        );
-      },
+    _boardState = AppFlowyBoardState();
+    _phantomController = BoardPhantomController(
+      delegate: widget.boardController,
+      groupsState: _boardState,
     );
+
+    if (widget.scrollManager != null) {
+      widget.scrollManager!._boardState = _boardState;
+    }
   }
 
   @override
-  Widget build(BuildContext context) => BoardOverlay(
-        key: _boardContentKey,
-        initialEntries: [_overlayEntry],
-      );
+  void dispose() {
+    // Dispose internally created scroll controller
+    if (widget.scrollController == null) {
+      _scrollController.dispose();
+    }
+    // Dispose all group scroll controllers
+    for (final controller in _groupScrollControllers.values) {
+      controller.dispose();
+    }
+    _groupScrollControllers.clear();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      fit: StackFit.passthrough,
+      children: [
+        if (widget.background != null)
+          Container(
+            clipBehavior: Clip.hardEdge,
+            decoration: BoxDecoration(
+              borderRadius:
+                  BorderRadius.circular(widget.config.boardCornerRadius),
+            ),
+            child: widget.background,
+          ),
+        Scrollbar(
+          controller: _scrollController,
+          child: SingleChildScrollView(
+            scrollDirection: widget.reorderFlexConfig.direction,
+            controller: _scrollController,
+            child: ReorderFlex(
+              config: widget.reorderFlexConfig,
+              scrollController: _scrollController,
+              onReorder: widget.onReorder,
+              dataSource: widget.boardController,
+              autoScroll: true,
+              interceptor: OverlappingDragTargetInterceptor(
+                reorderFlexId: widget.boardController.identifier,
+                acceptedReorderFlexId: widget.boardController.groupIds,
+                delegate: _phantomController,
+                columnsState: _boardState,
+              ),
+              leading: widget.leading,
+              trailing: widget.trailing,
+              children: _buildColumns(),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  ScrollController _getOrCreateGroupScrollController(String groupId) {
+    if (!_groupScrollControllers.containsKey(groupId)) {
+      _groupScrollControllers[groupId] = ScrollController();
+    }
+    return _groupScrollControllers[groupId]!;
+  }
 
   List<Widget> _buildColumns() {
     final List<Widget> children = [];
+
+    // Clean up scroll controllers for removed groups
+    final currentGroupIds =
+        widget.boardController.groupDatas.map((g) => g.id).toSet();
+    final removedGroupIds = _groupScrollControllers.keys
+        .where((id) => !currentGroupIds.contains(id))
+        .toList();
+    for (final groupId in removedGroupIds) {
+      _groupScrollControllers[groupId]?.dispose();
+      _groupScrollControllers.remove(groupId);
+    }
 
     widget.boardController.groupDatas.asMap().entries.map((item) {
       final columnData = item.value;
@@ -285,7 +309,7 @@ class _AppFlowyBoardContentState extends State<_AppFlowyBoardContent> {
       );
 
       final reorderFlexAction = ReorderFlexActionImpl();
-      widget.boardState.reorderFlexActionMap[columnData.id] = reorderFlexAction;
+      _boardState.reorderFlexActionMap[columnData.id] = reorderFlexAction;
 
       children.add(
         ChangeNotifierProvider.value(
@@ -301,14 +325,15 @@ class _AppFlowyBoardContentState extends State<_AppFlowyBoardContent> {
                 footerBuilder: widget.footerBuilder,
                 cardBuilder: widget.cardBuilder,
                 dataSource: dataSource,
-                scrollController: ScrollController(),
+                scrollController:
+                    _getOrCreateGroupScrollController(columnData.id),
                 shrinkWrap: widget.shrinkWrap,
-                phantomController: widget.phantomController,
+                phantomController: _phantomController,
                 onReorder: widget.boardController.moveGroupItem,
                 cornerRadius: widget.config.groupCornerRadius,
                 backgroundColor: widget.config.groupBackgroundColor,
-                dragStateStorage: widget.boardState,
-                dragTargetKeys: widget.boardState,
+                dragStateStorage: _boardState,
+                dragTargetKeys: _boardState,
                 reorderFlexAction: reorderFlexAction,
                 stretchGroupHeight: widget.config.stretchGroupHeight,
                 onDragStarted: (index) {

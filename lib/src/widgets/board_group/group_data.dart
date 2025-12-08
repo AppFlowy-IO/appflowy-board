@@ -36,7 +36,7 @@ class AppFlowyGroupController extends ChangeNotifier with EquatableMixin {
   @override
   List<Object?> get props => groupData.props;
 
-  /// Returns the readonly List<AppFlowyGroupItem>
+  /// Returns the readonly [UnmodifiableListView] of [AppFlowyGroupItem]
   UnmodifiableListView<AppFlowyGroupItem> get items =>
       UnmodifiableListView(groupData.items);
 
@@ -53,15 +53,10 @@ class AppFlowyGroupController extends ChangeNotifier with EquatableMixin {
   /// listener. Set to false if you do not want to notify the listeners.
   ///
   AppFlowyGroupItem? removeAt(int index, {bool notify = true}) {
-    if (groupData._items.length <= index) {
+    if (index < 0 || index >= groupData._items.length) {
       Log.error(
-        'Fatal error, index is out of bounds. Index: $index,  len: ${groupData._items.length}',
+        'Index out of bounds. Index: $index, length: ${groupData._items.length}',
       );
-      return null;
-    }
-
-    if (index < 0) {
-      Log.error('Invalid index:$index');
       return null;
     }
 
@@ -209,7 +204,7 @@ class AppFlowyGroupData<CustomData> extends ReoderFlexItem with EquatableMixin {
 
   final List<AppFlowyGroupItem> _items;
 
-  /// Returns the readonly List<AppFlowyGroupItem>
+  /// Returns the readonly [UnmodifiableListView] of [AppFlowyGroupItem]
   UnmodifiableListView<AppFlowyGroupItem> get items =>
       UnmodifiableListView([..._items]);
 

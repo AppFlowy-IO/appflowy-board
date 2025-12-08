@@ -3,7 +3,6 @@ import 'dart:collection';
 import 'package:appflowy_board/src/widgets/reorder_flex/drag_state.dart';
 import 'package:flutter/material.dart';
 
-import '../../rendering/board_overlay.dart';
 import '../../utils/log.dart';
 import '../reorder_flex/drag_target_interceptor.dart';
 import '../reorder_flex/reorder_flex.dart';
@@ -111,107 +110,91 @@ class AppFlowyBoardGroup extends StatefulWidget {
 }
 
 class _AppFlowyBoardGroupState extends State<AppFlowyBoardGroup> {
-  final GlobalKey _columnOverlayKey =
-      GlobalKey(debugLabel: '$AppFlowyBoardGroup overlay key');
-  late BoardOverlayEntry _overlayEntry;
-
   @override
-  void initState() {
-    super.initState();
+  Widget build(BuildContext context) {
+    final children = widget.dataSource.groupData.items
+        .map((item) => _buildWidget(context, item))
+        .toList();
 
-    _overlayEntry = BoardOverlayEntry(
-      builder: (BuildContext context) {
-        final children = widget.dataSource.groupData.items
-            .map((item) => _buildWidget(context, item))
-            .toList();
+    final header =
+        widget.headerBuilder?.call(context, widget.dataSource.groupData);
 
-        final header =
-            widget.headerBuilder?.call(context, widget.dataSource.groupData);
+    final footer =
+        widget.footerBuilder?.call(context, widget.dataSource.groupData);
 
-        final footer =
-            widget.footerBuilder?.call(context, widget.dataSource.groupData);
+    final interceptor = CrossReorderFlexDragTargetInterceptor(
+      reorderFlexId: widget.groupId,
+      delegate: widget.phantomController,
+      acceptedReorderFlexIds: widget.dataSource.acceptedGroupIds,
+      draggableTargetBuilder: PhantomDraggableBuilder(),
+    );
 
-        final interceptor = CrossReorderFlexDragTargetInterceptor(
-          reorderFlexId: widget.groupId,
-          delegate: widget.phantomController,
-          acceptedReorderFlexIds: widget.dataSource.acceptedGroupIds,
-          draggableTargetBuilder: PhantomDraggableBuilder(),
-        );
+    final paddingWidget = Padding(
+      padding: widget.bodyPadding,
+      child: SingleChildScrollView(
+        scrollDirection: widget.config.direction,
+        controller: widget.scrollController,
+        child: ReorderFlex(
+          key: ValueKey(widget.groupId),
+          dragStateStorage: widget.dragStateStorage,
+          dragTargetKeys: widget.dragTargetKeys,
+          scrollController: widget.scrollController,
+          config: widget.config,
+          onDragStarted: (index) {
+            widget.phantomController.groupStartDragging(widget.groupId);
+            widget.onDragStarted?.call(index);
+          },
+          onReorder: (fromIndex, toIndex) {
+            if (widget.phantomController.shouldReorder(widget.groupId)) {
+              widget.onReorder(widget.groupId, fromIndex, toIndex);
+              widget.phantomController.updateIndex(fromIndex, toIndex);
+            }
+          },
+          onDragEnded: () {
+            widget.phantomController.groupEndDragging(widget.groupId);
+            widget.onDragEnded?.call(widget.groupId);
+            widget.dataSource.debugPrint();
+          },
+          dataSource: widget.dataSource,
+          interceptor: interceptor,
+          reorderFlexAction: widget.reorderFlexAction,
+          children: children,
+        ),
+      ),
+    );
 
-        final paddingWidget = Padding(
-          padding: widget.bodyPadding,
-          child: SingleChildScrollView(
-            scrollDirection: widget.config.direction,
-            controller: widget.scrollController,
-            child: ReorderFlex(
-              key: ValueKey(widget.groupId),
-              dragStateStorage: widget.dragStateStorage,
-              dragTargetKeys: widget.dragTargetKeys,
-              scrollController: widget.scrollController,
-              config: widget.config,
-              onDragStarted: (index) {
-                widget.phantomController.groupStartDragging(widget.groupId);
-                widget.onDragStarted?.call(index);
-              },
-              onReorder: (fromIndex, toIndex) {
-                if (widget.phantomController.shouldReorder(widget.groupId)) {
-                  widget.onReorder(widget.groupId, fromIndex, toIndex);
-                  widget.phantomController.updateIndex(fromIndex, toIndex);
-                }
-              },
-              onDragEnded: () {
-                widget.phantomController.groupEndDragging(widget.groupId);
-                widget.onDragEnded?.call(widget.groupId);
-                widget.dataSource.debugPrint();
-              },
-              dataSource: widget.dataSource,
-              interceptor: interceptor,
-              reorderFlexAction: widget.reorderFlexAction,
-              children: children,
+    final reorderWidget = widget.shrinkWrap
+        ? paddingWidget
+        : Flexible(
+            fit: widget.stretchGroupHeight ? FlexFit.tight : FlexFit.loose,
+            child: paddingWidget,
+          );
+
+    final childrenWidgets = [
+      if (header != null) header,
+      reorderWidget,
+      if (footer != null) footer,
+    ];
+
+    return Container(
+      margin: widget.margin,
+      clipBehavior: Clip.hardEdge,
+      decoration: BoxDecoration(
+        color: widget.backgroundColor,
+        borderRadius: BorderRadius.circular(widget.cornerRadius),
+      ),
+      child: widget.shrinkWrap
+          ? Column(
+              mainAxisSize: MainAxisSize.min,
+              children: childrenWidgets,
+            )
+          : Flex(
+              direction: Axis.vertical,
+              mainAxisSize: MainAxisSize.min,
+              children: childrenWidgets,
             ),
-          ),
-        );
-
-        final reorderWidget = widget.shrinkWrap
-            ? paddingWidget
-            : Flexible(
-                fit: widget.stretchGroupHeight ? FlexFit.tight : FlexFit.loose,
-                child: paddingWidget,
-              );
-
-        final childrenWidgets = [
-          if (header != null) header,
-          reorderWidget,
-          if (footer != null) footer,
-        ];
-
-        return Container(
-          margin: widget.margin,
-          clipBehavior: Clip.hardEdge,
-          decoration: BoxDecoration(
-            color: widget.backgroundColor,
-            borderRadius: BorderRadius.circular(widget.cornerRadius),
-          ),
-          child: widget.shrinkWrap
-              ? Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: childrenWidgets,
-                )
-              : Flex(
-                  direction: Axis.vertical,
-                  mainAxisSize: MainAxisSize.min,
-                  children: childrenWidgets,
-                ),
-        );
-      },
     );
   }
-
-  @override
-  Widget build(BuildContext context) => BoardOverlay(
-        key: _columnOverlayKey,
-        initialEntries: [_overlayEntry],
-      );
 
   Widget _buildWidget(BuildContext context, AppFlowyGroupItem item) {
     if (item is PhantomGroupItem) {

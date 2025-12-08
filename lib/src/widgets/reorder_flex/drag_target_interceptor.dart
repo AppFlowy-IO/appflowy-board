@@ -121,6 +121,11 @@ class OverlappingDragTargetInterceptor extends DragTargetInterceptor {
 
     return true;
   }
+
+  @override
+  void onLeave(FlexDragTargetData dragTargetData) {
+    _delayOperation?.cancel();
+  }
 }
 
 abstract class CrossReorderFlexDragTargetDelegate {
