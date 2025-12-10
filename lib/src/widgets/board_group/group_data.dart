@@ -27,7 +27,7 @@ abstract class AppFlowyGroupItem extends ReoderFlexItem {
 /// * Replace item at index by calling [replace] method.
 ///
 /// All there operations will notify listeners by default.
-///
+// ignore: must_be_immutable
 class AppFlowyGroupController extends ChangeNotifier with EquatableMixin {
   AppFlowyGroupController({required this.groupData});
 
@@ -36,7 +36,7 @@ class AppFlowyGroupController extends ChangeNotifier with EquatableMixin {
   @override
   List<Object?> get props => groupData.props;
 
-  /// Returns the readonly List<AppFlowyGroupItem>
+  /// Returns the readonly [UnmodifiableListView] of [AppFlowyGroupItem]
   UnmodifiableListView<AppFlowyGroupItem> get items =>
       UnmodifiableListView(groupData.items);
 
@@ -53,15 +53,10 @@ class AppFlowyGroupController extends ChangeNotifier with EquatableMixin {
   /// listener. Set to false if you do not want to notify the listeners.
   ///
   AppFlowyGroupItem? removeAt(int index, {bool notify = true}) {
-    if (groupData._items.length <= index) {
+    if (index < 0 || index >= groupData._items.length) {
       Log.error(
-        'Fatal error, index is out of bounds. Index: $index,  len: ${groupData._items.length}',
+        'Index out of bounds. Index: $index, length: ${groupData._items.length}',
       );
-      return null;
-    }
-
-    if (index < 0) {
-      Log.error('Invalid index:$index');
       return null;
     }
 
@@ -190,6 +185,7 @@ class AppFlowyGroupController extends ChangeNotifier with EquatableMixin {
 }
 
 /// [AppFlowyGroupData] represents the data of each group of the Board.
+// ignore: must_be_immutable
 class AppFlowyGroupData<CustomData> extends ReoderFlexItem with EquatableMixin {
   AppFlowyGroupData({
     required this.id,
@@ -209,7 +205,7 @@ class AppFlowyGroupData<CustomData> extends ReoderFlexItem with EquatableMixin {
 
   final List<AppFlowyGroupItem> _items;
 
-  /// Returns the readonly List<AppFlowyGroupItem>
+  /// Returns the readonly [UnmodifiableListView] of [AppFlowyGroupItem]
   UnmodifiableListView<AppFlowyGroupItem> get items =>
       UnmodifiableListView([..._items]);
 

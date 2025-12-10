@@ -1,5 +1,5 @@
 /// AppFlowyBoard library
-library appflowy_board;
+library;
 
 export 'src/widgets/board_group/group_data.dart';
 export 'src/widgets/board_data.dart';

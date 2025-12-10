@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:appflowy_board/appflowy_board.dart';
 
 class SingleBoardListExample extends StatefulWidget {
-  const SingleBoardListExample({Key? key}) : super(key: key);
+  const SingleBoardListExample({super.key});
 
   @override
   State<SingleBoardListExample> createState() => _SingleBoardListExampleState();
@@ -43,7 +43,7 @@ class _SingleBoardListExampleState extends State<SingleBoardListExample> {
 
 class _RowWidget extends StatelessWidget {
   final TextItem item;
-  const _RowWidget({Key? key, required this.item}) : super(key: key);
+  const _RowWidget({super.key, required this.item});
 
   @override
   Widget build(BuildContext context) {
