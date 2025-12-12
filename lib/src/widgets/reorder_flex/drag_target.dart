@@ -239,13 +239,11 @@ class _ReorderDragTargetState<T extends DragTargetData>
     BoxConstraints constraints,
     Widget child,
   ) {
-    return Transform(
-      transform: Matrix4.rotationZ(0),
-      alignment: FractionalOffset.topLeft,
+    // Wrap in RepaintBoundary to isolate repaints during drag operations
+    return RepaintBoundary(
       child: Material(
         color: Colors.transparent,
         borderRadius: BorderRadius.zero,
-        clipBehavior: Clip.hardEdge,
         child: ConstrainedBox(
           constraints: constraints,
           child: Opacity(opacity: widget.draggingOpacity, child: child),
@@ -283,7 +281,8 @@ class DragTargetAnimation {
     deleteController = AnimationController(
       value: 0.0,
       vsync: vsync,
-      duration: const Duration(milliseconds: 1),
+      // Increased from 1ms for smoother animation
+      duration: const Duration(milliseconds: 150),
     );
   }
 

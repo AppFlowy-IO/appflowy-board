@@ -176,23 +176,34 @@ class _AppFlowyBoardGroupState extends State<AppFlowyBoardGroup> {
       if (footer != null) footer,
     ];
 
+    // Use decoration-based clipping which is more efficient
+    // Only add ClipRRect when corner radius requires actual clipping
+    Widget content = widget.shrinkWrap
+        ? Column(
+            mainAxisSize: MainAxisSize.min,
+            children: childrenWidgets,
+          )
+        : Flex(
+            direction: Axis.vertical,
+            mainAxisSize: MainAxisSize.min,
+            children: childrenWidgets,
+          );
+
+    // Only clip if corner radius is > 0
+    if (widget.cornerRadius > 0) {
+      content = ClipRRect(
+        borderRadius: BorderRadius.circular(widget.cornerRadius),
+        child: content,
+      );
+    }
+
     return Container(
       margin: widget.margin,
-      clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(
         color: widget.backgroundColor,
         borderRadius: BorderRadius.circular(widget.cornerRadius),
       ),
-      child: widget.shrinkWrap
-          ? Column(
-              mainAxisSize: MainAxisSize.min,
-              children: childrenWidgets,
-            )
-          : Flex(
-              direction: Axis.vertical,
-              mainAxisSize: MainAxisSize.min,
-              children: childrenWidgets,
-            ),
+      child: content,
     );
   }
 
@@ -205,6 +216,14 @@ class _AppFlowyBoardGroupState extends State<AppFlowyBoardGroup> {
       );
     }
 
-    return widget.cardBuilder(context, widget.dataSource.groupData, item);
+    final card = widget.cardBuilder(context, widget.dataSource.groupData, item);
+
+    // Wrap each card in RepaintBoundary to isolate repaints
+    // This improves performance when individual cards update
+    // Preserve the key from the card widget for the ReorderFlex
+    return RepaintBoundary(
+      key: card.key,
+      child: card,
+    );
   }
 }

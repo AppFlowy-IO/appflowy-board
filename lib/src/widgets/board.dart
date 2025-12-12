@@ -243,12 +243,10 @@ class _AppFlowyBoardContentState extends State<_AppFlowyBoardContent> {
       fit: StackFit.passthrough,
       children: [
         if (widget.background != null)
-          Container(
-            clipBehavior: Clip.hardEdge,
-            decoration: BoxDecoration(
-              borderRadius:
-                  BorderRadius.circular(widget.config.boardCornerRadius),
-            ),
+          // Use ClipRRect for better performance than Container with clipBehavior
+          ClipRRect(
+            borderRadius:
+                BorderRadius.circular(widget.config.boardCornerRadius),
             child: widget.background,
           ),
         Scrollbar(

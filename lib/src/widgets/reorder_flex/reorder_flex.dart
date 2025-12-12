@@ -174,6 +174,9 @@ class ReorderFlexState extends State<ReorderFlex>
   /// Key used to get the container's render box for auto-scroll bounds calculation.
   final GlobalKey _containerKey = GlobalKey();
 
+  /// Cache for GlobalObjectKey instances to avoid recreating them on every build.
+  final Map<String, GlobalObjectKey> _keyCache = {};
+
   @override
   void initState() {
     super.initState();
@@ -243,7 +246,11 @@ class ReorderFlexState extends State<ReorderFlex>
       final Widget child = widget.children[i];
       final ReoderFlexItem item = widget.dataSource.items[i];
 
-      final indexKey = GlobalObjectKey(child.key!);
+      // Use cached GlobalObjectKey to avoid recreating on every build
+      final indexKey = _keyCache.putIfAbsent(
+        item.id,
+        () => GlobalObjectKey(child.key!),
+      );
       // Save the index key for quick access
       widget.dragTargetKeys?.insertDragTarget(
         widget.reorderFlexId,
@@ -261,6 +268,7 @@ class ReorderFlexState extends State<ReorderFlex>
   void dispose() {
     _animation.dispose();
     _autoScroller?.dispose();
+    _keyCache.clear();
     if (widget.scrollController == null) {
       _scrollController.dispose();
     }

@@ -12,23 +12,27 @@ mixin ReorderFlexMixin {
     Size? draggingFeedbackSize,
     Axis direction,
   ) {
-    final sizeFactor = animationController.withLinearCurve();
     if (null == draggingFeedbackSize) {
-      return SizeTransitionWithIntrinsicSize(
-        sizeFactor: sizeFactor,
-        axis: direction,
-        child: FadeTransition(
-          opacity: sizeFactor,
-          child: child,
+      // Wrap in RepaintBoundary to isolate animation repaints
+      return RepaintBoundary(
+        child: SizeTransitionWithIntrinsicSize(
+          sizeFactor: animationController,
+          axis: direction,
+          child: FadeTransition(
+            opacity: animationController,
+            child: child,
+          ),
         ),
       );
     } else {
-      return ConstrainedBox(
-        constraints: BoxConstraints.loose(draggingFeedbackSize),
-        child: SizeTransition(
-          sizeFactor: sizeFactor,
-          axis: direction,
-          child: FadeTransition(opacity: animationController, child: child),
+      return RepaintBoundary(
+        child: ConstrainedBox(
+          constraints: BoxConstraints.loose(draggingFeedbackSize),
+          child: SizeTransition(
+            sizeFactor: animationController,
+            axis: direction,
+            child: FadeTransition(opacity: animationController, child: child),
+          ),
         ),
       );
     }
@@ -41,38 +45,35 @@ mixin ReorderFlexMixin {
     Size? draggingFeedbackSize,
     Axis direction,
   ) {
-    final sizeFactor = animationController.withLinearCurve();
     if (null == draggingFeedbackSize) {
-      return SizeTransitionWithIntrinsicSize(
-        sizeFactor: sizeFactor,
-        axis: direction,
-        child: FadeTransition(
-          opacity: sizeFactor,
-          child: child,
+      // Wrap in RepaintBoundary to isolate animation repaints
+      return RepaintBoundary(
+        child: SizeTransitionWithIntrinsicSize(
+          sizeFactor: animationController,
+          axis: direction,
+          child: FadeTransition(
+            opacity: animationController,
+            child: child,
+          ),
         ),
       );
     } else {
-      return ConstrainedBox(
-        constraints: BoxConstraints.loose(draggingFeedbackSize),
-        child: SizeTransition(
-          sizeFactor: sizeFactor,
-          axis: direction,
-          child: FadeTransition(opacity: animationController, child: child),
+      return RepaintBoundary(
+        child: ConstrainedBox(
+          constraints: BoxConstraints.loose(draggingFeedbackSize),
+          child: SizeTransition(
+            sizeFactor: animationController,
+            axis: direction,
+            child: FadeTransition(opacity: animationController, child: child),
+          ),
         ),
       );
     }
   }
 }
 
-extension CurveAnimationController on AnimationController {
-  Animation<double> withLinearCurve() {
-    return withCurve(Curves.linear);
-  }
-
-  Animation<double> withCurve(Curve curve) {
-    return CurvedAnimation(parent: this, curve: curve);
-  }
-}
+// Note: CurveAnimationController extension was removed as part of performance optimization.
+// Using AnimationController directly avoids creating new CurvedAnimation instances on every frame.
 
 class ReorderFlexNotifier extends DragTargetMovePlaceholderDelegate {
   Map<int, DragTargetEventNotifier> dragTargeEventNotifier = {};
