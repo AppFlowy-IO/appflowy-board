@@ -33,6 +33,8 @@ class AppFlowyBoardConfig {
     this.stretchGroupHeight = true,
     this.cardMargin = const EdgeInsets.symmetric(horizontal: 3, vertical: 4),
     this.dragAutoScrollVelocity = 30.0,
+    this.cardPageSize = 10,
+    this.loadMoreTriggerOffset = 80.0,
   });
 
   // board
@@ -54,6 +56,13 @@ class AppFlowyBoardConfig {
   /// Lower values result in slower scrolling. Default is 30.0.
   /// Increase this value for faster scrolling, decrease for slower.
   final double dragAutoScrollVelocity;
+
+  /// Number of cards to render per "page" when lazy loading.
+  /// Set to 0 or less to render all cards.
+  final int cardPageSize;
+
+  /// Distance from the bottom that triggers loading more cards.
+  final double loadMoreTriggerOffset;
 }
 
 class AppFlowyBoard extends StatelessWidget {
@@ -68,6 +77,9 @@ class AppFlowyBoard extends StatelessWidget {
     this.scrollController,
     this.config = const AppFlowyBoardConfig(),
     this.boardScrollController,
+    this.onLoadMore,
+    this.hasMore,
+    this.loadingWidgetBuilder,
     this.leading,
     this.trailing,
     this.shrinkWrap = false,
@@ -124,6 +136,16 @@ class AppFlowyBoard extends StatelessWidget {
   ///
   final AppFlowyBoardScrollController? boardScrollController;
 
+  /// Called when a group scrolls near the bottom to load more cards.
+  final OnLoadMoreCards? onLoadMore;
+
+  /// Returns true if a group has more cards to load.
+  final HasMoreCards? hasMore;
+
+  /// Custom builder for the loading indicator widget.
+  /// If not provided, a default CircularProgressIndicator will be used.
+  final LoadingWidgetBuilder? loadingWidgetBuilder;
+
   /// A widget that is shown before the first group in the Board
   ///
   final Widget? leading;
@@ -151,6 +173,9 @@ class AppFlowyBoard extends StatelessWidget {
             cardBuilder: cardBuilder,
             footerBuilder: footerBuilder,
             headerBuilder: headerBuilder,
+            onLoadMore: onLoadMore,
+            hasMore: hasMore,
+            loadingWidgetBuilder: loadingWidgetBuilder,
             onReorder: controller.moveGroup,
             leading: leading,
             trailing: trailing,
@@ -170,6 +195,9 @@ class _AppFlowyBoardContent extends StatefulWidget {
     required this.scrollManager,
     required this.groupConstraints,
     required this.cardBuilder,
+    this.onLoadMore,
+    this.hasMore,
+    this.loadingWidgetBuilder,
     this.leading,
     this.trailing,
     this.shrinkWrap = false,
@@ -189,6 +217,9 @@ class _AppFlowyBoardContent extends StatefulWidget {
   final AppFlowyBoardScrollController? scrollManager;
   final BoxConstraints groupConstraints;
   final AppFlowyBoardCardBuilder cardBuilder;
+  final OnLoadMoreCards? onLoadMore;
+  final HasMoreCards? hasMore;
+  final LoadingWidgetBuilder? loadingWidgetBuilder;
   final Widget? leading;
   final Widget? trailing;
   final ScrollController? scrollController;
@@ -360,6 +391,11 @@ class _AppFlowyBoardContentState extends State<_AppFlowyBoardContent> {
                 dragTargetKeys: _boardState,
                 reorderFlexAction: reorderFlexAction,
                 stretchGroupHeight: widget.config.stretchGroupHeight,
+                cardPageSize: widget.config.cardPageSize,
+                loadMoreTriggerOffset: widget.config.loadMoreTriggerOffset,
+                onLoadMore: widget.onLoadMore,
+                hasMore: widget.hasMore,
+                loadingWidgetBuilder: widget.loadingWidgetBuilder,
                 onDragStarted: (index) {
                   widget.boardController.onStartDraggingCard
                       ?.call(columnData.id, index);
