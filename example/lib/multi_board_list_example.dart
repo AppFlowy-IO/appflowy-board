@@ -29,20 +29,14 @@ class _MultiBoardListExampleState extends State<MultiBoardListExample> {
     super.initState();
     boardController = AppFlowyBoardScrollController();
     final group1 = AppFlowyGroupData(id: "To Do", name: "To Do", items: [
-      TextItem("Card 1"),
-      TextItem("Card 2"),
-      RichTextItem(title: "Card 3", subtitle: 'Aug 1, 2020 4:05 PM'),
-      TextItem("Card 4"),
-      TextItem("Card 5"),
+      for (int i = 1; i <= 50; i++) TextItem("Todo $i"),
     ]);
 
     final group2 = AppFlowyGroupData(
       id: "In Progress",
       name: "In Progress",
       items: <AppFlowyGroupItem>[
-        TextItem("Card 6"),
-        RichTextItem(title: "Card 7", subtitle: 'Aug 1, 2020 4:05 PM'),
-        RichTextItem(title: "Card 8", subtitle: 'Aug 1, 2020 4:05 PM'),
+        for (int i = 1; i <= 35; i++) TextItem("Progress $i"),
       ],
     );
 
@@ -50,25 +44,19 @@ class _MultiBoardListExampleState extends State<MultiBoardListExample> {
         id: "Pending",
         name: "Pending",
         items: <AppFlowyGroupItem>[
-          TextItem("Card 9"),
-          RichTextItem(title: "Card 10", subtitle: 'Aug 1, 2020 4:05 PM'),
-          TextItem("Card 11"),
-          TextItem("Card 12"),
+          for (int i = 1; i <= 40; i++) TextItem("Pending $i"),
         ]);
     final group4 = AppFlowyGroupData(
         id: "Canceled",
         name: "Canceled",
         items: <AppFlowyGroupItem>[
-          TextItem("Card 13"),
-          TextItem("Card 14"),
-          TextItem("Card 15"),
+          for (int i = 1; i <= 25; i++) TextItem("Canceled $i"),
         ]);
     final group5 = AppFlowyGroupData(
         id: "Urgent",
         name: "Urgent",
         items: <AppFlowyGroupItem>[
-          TextItem("Card 14"),
-          TextItem("Card 15"),
+          for (int i = 1; i <= 30; i++) TextItem("Urgent $i"),
         ]);
 
     controller.addGroup(group1);
@@ -83,6 +71,7 @@ class _MultiBoardListExampleState extends State<MultiBoardListExample> {
     final config = AppFlowyBoardConfig(
       groupBackgroundColor: HexColor.fromHex('#F7F8FC'),
       stretchGroupHeight: false,
+      cardPageSize: 10,
     );
     return AppFlowyBoard(
         controller: controller,
@@ -91,6 +80,10 @@ class _MultiBoardListExampleState extends State<MultiBoardListExample> {
             key: ValueKey(groupItem.id),
             child: _buildCard(groupItem),
           );
+        },
+        onLoadMore: (groupData) async {
+          // Simulate network delay for loading more cards
+          await Future.delayed(const Duration(milliseconds: 500));
         },
         boardScrollController: boardController,
         footerBuilder: (context, columnData) {

@@ -32,16 +32,22 @@ Widget buildTestBoard({
   BoxConstraints groupConstraints = const BoxConstraints.tightFor(width: 200),
   AppFlowyBoardConfig config = const AppFlowyBoardConfig(),
   bool shrinkWrap = false,
+  OnLoadMoreCards? onLoadMore,
+  HasMoreCards? hasMore,
+  double? cardHeight,
 }) {
   return MaterialApp(
     home: Scaffold(
       body: AppFlowyBoard(
         controller: controller,
         boardScrollController: scrollController,
+        onLoadMore: onLoadMore,
+        hasMore: hasMore,
         cardBuilder: (context, group, groupItem) {
           return AppFlowyGroupCard(
             key: ValueKey(groupItem.id),
             child: Container(
+              height: cardHeight,
               padding: const EdgeInsets.all(8),
               child: Text(
                 groupItem.id,
@@ -814,6 +820,112 @@ void main() {
 
       // Scroll controller should be connected
       expect(find.byType(AppFlowyBoard), findsOneWidget);
+    });
+  });
+
+  group('AppFlowyBoard - Lazy Loading', () {
+    testWidgets('limits initial visible cards', (tester) async {
+      final controller = createTestController();
+      controller.addGroup(AppFlowyGroupData(
+        id: 'group1',
+        name: 'Group 1',
+        items: List.generate(12, (i) => TextItem('Item $i')),
+      ),);
+
+      await tester.pumpWidget(buildTestBoard(
+        controller: controller,
+        config: const AppFlowyBoardConfig(cardPageSize: 5),
+      ),);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Item 0'), findsOneWidget);
+      expect(find.text('Item 4'), findsOneWidget);
+      expect(find.text('Item 5'), findsNothing);
+    });
+
+    testWidgets('loads more cards when scrolling to bottom', (tester) async {
+      final controller = createTestController();
+      controller.addGroup(AppFlowyGroupData(
+        id: 'group1',
+        name: 'Group 1',
+        items: List.generate(8, (i) => TextItem('Item $i')),
+      ),);
+
+      var loadCalls = 0;
+
+      await tester.pumpWidget(buildTestBoard(
+        controller: controller,
+        config: const AppFlowyBoardConfig(
+          cardPageSize: 3,
+          loadMoreTriggerOffset: 0,
+        ),
+        groupConstraints: const BoxConstraints.tightFor(width: 200, height: 120),
+        cardHeight: 60,
+        onLoadMore: (_) async {
+          loadCalls += 1;
+        },
+      ),);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Item 2'), findsOneWidget);
+      expect(find.text('Item 5'), findsNothing);
+
+      final verticalScrollable = find.byWidgetPredicate((widget) {
+        return widget is Scrollable &&
+            (widget.axisDirection == AxisDirection.down ||
+                widget.axisDirection == AxisDirection.up);
+      });
+      expect(verticalScrollable, findsOneWidget);
+
+      final scrollableState =
+          tester.state<ScrollableState>(verticalScrollable);
+      scrollableState.position.jumpTo(
+        scrollableState.position.maxScrollExtent,
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Item 5'), findsOneWidget);
+      expect(loadCalls, 1);
+    });
+
+    testWidgets('respects hasMore false', (tester) async {
+      final controller = createTestController();
+      controller.addGroup(AppFlowyGroupData(
+        id: 'group1',
+        name: 'Group 1',
+        items: List.generate(8, (i) => TextItem('Item $i')),
+      ),);
+
+      await tester.pumpWidget(buildTestBoard(
+        controller: controller,
+        config: const AppFlowyBoardConfig(
+          cardPageSize: 3,
+          loadMoreTriggerOffset: 0,
+        ),
+        groupConstraints: const BoxConstraints.tightFor(width: 200, height: 120),
+        cardHeight: 60,
+        hasMore: (_) => false,
+      ),);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Item 2'), findsOneWidget);
+      expect(find.text('Item 3'), findsNothing);
+
+      final verticalScrollable = find.byWidgetPredicate((widget) {
+        return widget is Scrollable &&
+            (widget.axisDirection == AxisDirection.down ||
+                widget.axisDirection == AxisDirection.up);
+      });
+      expect(verticalScrollable, findsOneWidget);
+
+      final scrollableState =
+          tester.state<ScrollableState>(verticalScrollable);
+      scrollableState.position.jumpTo(
+        scrollableState.position.maxScrollExtent,
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Item 3'), findsNothing);
     });
   });
 
