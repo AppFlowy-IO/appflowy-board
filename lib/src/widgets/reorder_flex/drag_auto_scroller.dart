@@ -62,6 +62,16 @@ class BoardDragAutoScroller {
   Rect? _getContainerRect(BuildContext? containerContext) {
     RenderBox? renderBox;
 
+    if (scrollController.hasClients) {
+      final position = scrollController.positions.first;
+      final scrollContext = position.context.storageContext;
+      renderBox = scrollContext.findRenderObject() as RenderBox?;
+      if (renderBox != null && renderBox.hasSize) {
+        final offset = renderBox.localToGlobal(Offset.zero);
+        return offset & renderBox.size;
+      }
+    }
+
     if (_containerKey?.currentContext != null) {
       renderBox =
           _containerKey!.currentContext!.findRenderObject() as RenderBox?;

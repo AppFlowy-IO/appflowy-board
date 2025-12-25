@@ -85,6 +85,7 @@ class OverlappingDragTargetInterceptor extends DragTargetInterceptor {
     required int dragTargetIndex,
   }) {
     if (dragTargetId == dragTargetData.reorderFlexId) {
+      _delayOperation?.cancel();
       delegate.cancel();
     } else {
       // Ignore the event if the dragTarget overlaps with the other column's dragTargets.
@@ -102,6 +103,9 @@ class OverlappingDragTargetInterceptor extends DragTargetInterceptor {
       ///
       _delayOperation?.cancel();
       _delayOperation = Timer(const Duration(milliseconds: 100), () {
+        if (!dragTargetData.isDragging) {
+          return;
+        }
         final index = delegate.getInsertedIndex(dragTargetId);
         if (index != -1) {
           Log.trace(
@@ -120,6 +124,11 @@ class OverlappingDragTargetInterceptor extends DragTargetInterceptor {
     }
 
     return true;
+  }
+
+  @override
+  void onAccept(FlexDragTargetData dragTargetData) {
+    _delayOperation?.cancel();
   }
 
   @override

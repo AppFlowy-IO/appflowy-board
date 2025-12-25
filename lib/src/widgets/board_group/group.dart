@@ -176,23 +176,31 @@ class _AppFlowyBoardGroupState extends State<AppFlowyBoardGroup> {
       if (footer != null) footer,
     ];
 
+    Widget content = widget.shrinkWrap
+        ? Column(
+            mainAxisSize: MainAxisSize.min,
+            children: childrenWidgets,
+          )
+        : Flex(
+            direction: Axis.vertical,
+            mainAxisSize: MainAxisSize.min,
+            children: childrenWidgets,
+          );
+
+    content = widget.cornerRadius > 0
+        ? ClipRRect(
+            borderRadius: BorderRadius.circular(widget.cornerRadius),
+            child: content,
+          )
+        : ClipRect(child: content);
+
     return Container(
       margin: widget.margin,
-      clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(
         color: widget.backgroundColor,
         borderRadius: BorderRadius.circular(widget.cornerRadius),
       ),
-      child: widget.shrinkWrap
-          ? Column(
-              mainAxisSize: MainAxisSize.min,
-              children: childrenWidgets,
-            )
-          : Flex(
-              direction: Axis.vertical,
-              mainAxisSize: MainAxisSize.min,
-              children: childrenWidgets,
-            ),
+      child: content,
     );
   }
 
@@ -205,6 +213,10 @@ class _AppFlowyBoardGroupState extends State<AppFlowyBoardGroup> {
       );
     }
 
-    return widget.cardBuilder(context, widget.dataSource.groupData, item);
+    final card = widget.cardBuilder(context, widget.dataSource.groupData, item);
+    return RepaintBoundary(
+      key: ValueKey(item.id),
+      child: card,
+    );
   }
 }

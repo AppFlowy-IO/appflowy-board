@@ -205,21 +205,32 @@ class _AppFlowyBoardContent extends StatefulWidget {
 class _AppFlowyBoardContentState extends State<_AppFlowyBoardContent> {
   late final _scrollController =
       widget.scrollController ?? ScrollController();
-  late final AppFlowyBoardState _boardState;
-  late final BoardPhantomController _phantomController;
+  late AppFlowyBoardState _boardState;
+  late BoardPhantomController _phantomController;
   final Map<String, ScrollController> _groupScrollControllers = {};
 
   @override
   void initState() {
     super.initState();
-    _boardState = AppFlowyBoardState();
-    _phantomController = BoardPhantomController(
-      delegate: widget.boardController,
-      groupsState: _boardState,
-    );
+    _initBoardControllers();
+  }
 
-    if (widget.scrollManager != null) {
-      widget.scrollManager!._boardState = _boardState;
+  @override
+  void didUpdateWidget(covariant _AppFlowyBoardContent oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.boardController != widget.boardController) {
+      if (oldWidget.scrollManager != widget.scrollManager) {
+        oldWidget.scrollManager?._boardState = null;
+      }
+      _initBoardControllers();
+      _disposeGroupScrollControllers();
+      return;
+    }
+
+    if (oldWidget.scrollManager != widget.scrollManager) {
+      oldWidget.scrollManager?._boardState = null;
+      widget.scrollManager?._boardState = _boardState;
     }
   }
 
@@ -230,11 +241,24 @@ class _AppFlowyBoardContentState extends State<_AppFlowyBoardContent> {
       _scrollController.dispose();
     }
     // Dispose all group scroll controllers
+    _disposeGroupScrollControllers();
+    super.dispose();
+  }
+
+  void _initBoardControllers() {
+    _boardState = AppFlowyBoardState();
+    _phantomController = BoardPhantomController(
+      delegate: widget.boardController,
+      groupsState: _boardState,
+    );
+    widget.scrollManager?._boardState = _boardState;
+  }
+
+  void _disposeGroupScrollControllers() {
     for (final controller in _groupScrollControllers.values) {
       controller.dispose();
     }
     _groupScrollControllers.clear();
-    super.dispose();
   }
 
   @override
