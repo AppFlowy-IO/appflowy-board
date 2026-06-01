@@ -29,22 +29,44 @@ abstract class AppFlowyGroupItem extends ReoderFlexItem {
 /// All there operations will notify listeners by default.
 // ignore: must_be_immutable
 class AppFlowyGroupController extends ChangeNotifier with EquatableMixin {
-  AppFlowyGroupController({required this.groupData});
+  AppFlowyGroupController({required AppFlowyGroupData groupData})
+      : _groupData = groupData;
 
-  final AppFlowyGroupData groupData;
+  AppFlowyGroupData _groupData;
 
   @override
-  List<Object?> get props => groupData.props;
+  List<Object?> get props => _groupData.props;
 
   /// Returns the readonly [UnmodifiableListView] of [AppFlowyGroupItem]
   UnmodifiableListView<AppFlowyGroupItem> get items =>
-      UnmodifiableListView(groupData.items);
+      UnmodifiableListView(_groupData.items);
+
+  /// Returns the current group data
+  AppFlowyGroupData get groupData => _groupData;
+
+  /// Updates the group data, replacing the current one
+  set groupData(AppFlowyGroupData value) {
+    _groupData = value;
+    _notify();
+  }
 
   void updateGroupName(String newName) {
-    if (groupData.headerData.groupName != newName) {
-      groupData.headerData.groupName = newName;
+    if (_groupData.headerData.groupName != newName) {
+      _groupData.headerData.groupName = newName;
       _notify();
     }
+  }
+
+  /// Updates the background color of this group
+  void updateGroupColorOption(IColorOption option) {
+    _groupData = AppFlowyGroupData(
+      id: _groupData.id,
+      name: _groupData.headerData.groupName,
+      items: _groupData.items.toList(),
+      customData: _groupData.customData,
+      colorOption: option,
+    );
+    _notify();
   }
 
   /// Remove the item at [index].
@@ -191,6 +213,7 @@ class AppFlowyGroupData<CustomData> extends ReoderFlexItem with EquatableMixin {
     required this.id,
     required String name,
     this.customData,
+    this.colorOption,
     List<AppFlowyGroupItem> items = const [],
   })  : _items = items,
         headerData = AppFlowyGroupHeaderData(
@@ -203,6 +226,10 @@ class AppFlowyGroupData<CustomData> extends ReoderFlexItem with EquatableMixin {
   AppFlowyGroupHeaderData headerData;
   final CustomData? customData;
 
+  /// Optional per-group background color. If null, the board's
+  /// groupBackgroundColor from AppFlowyBoardConfig will be used.
+  final IColorOption? colorOption;
+
   final List<AppFlowyGroupItem> _items;
 
   /// Returns the readonly [UnmodifiableListView] of [AppFlowyGroupItem]
@@ -210,7 +237,7 @@ class AppFlowyGroupData<CustomData> extends ReoderFlexItem with EquatableMixin {
       UnmodifiableListView([..._items]);
 
   @override
-  List<Object?> get props => [id, ..._items];
+  List<Object?> get props => [id, ..._items, colorOption];
 
   @override
   String toString() => 'Group:[$id]';
@@ -224,4 +251,12 @@ class AppFlowyGroupHeaderData {
 
   String groupId;
   String groupName;
+}
+
+abstract class IColorOption {
+  String get title;
+  Color? backgroundColor(BuildContext context);
+  Color? palletteColor(BuildContext context);
+  Color? textColor(BuildContext context);
+  Color? labelColor(BuildContext context);
 }

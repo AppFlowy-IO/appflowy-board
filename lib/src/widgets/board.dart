@@ -29,7 +29,7 @@ class AppFlowyBoardConfig {
     this.groupMargin = const EdgeInsets.symmetric(horizontal: 8),
     this.groupHeaderPadding = const EdgeInsets.symmetric(horizontal: 16),
     this.groupBodyPadding = const EdgeInsets.symmetric(horizontal: 12),
-    this.groupFooterPadding = const EdgeInsets.symmetric(horizontal: 12),
+    this.groupFooterPadding = const EdgeInsets.fromLTRB(12, 0, 12, 8),
     this.stretchGroupHeight = true,
     this.cardMargin = const EdgeInsets.symmetric(horizontal: 3, vertical: 4),
     this.dragAutoScrollVelocity = 30.0,
@@ -83,6 +83,7 @@ class AppFlowyBoard extends StatelessWidget {
     this.leading,
     this.trailing,
     this.shrinkWrap = false,
+    this.scrollViewPadding,
   });
 
   /// A controller for [AppFlowyBoard] widget.
@@ -157,6 +158,9 @@ class AppFlowyBoard extends StatelessWidget {
   /// if [shrinkWrap] is true, the height of board will be dynamic
   final bool shrinkWrap;
 
+  /// Padding for the scroll view containing the board groups.
+  final EdgeInsetsGeometry? scrollViewPadding;
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.value(
@@ -180,6 +184,7 @@ class AppFlowyBoard extends StatelessWidget {
             leading: leading,
             trailing: trailing,
             shrinkWrap: shrinkWrap,
+            scrollViewPadding: scrollViewPadding,
           );
         },
       ),
@@ -205,6 +210,7 @@ class _AppFlowyBoardContent extends StatefulWidget {
     this.background,
     this.headerBuilder,
     this.footerBuilder,
+    this.scrollViewPadding,
   }) : reorderFlexConfig = ReorderFlexConfig(
           direction: Axis.horizontal,
           dragDirection: Axis.horizontal,
@@ -225,6 +231,7 @@ class _AppFlowyBoardContent extends StatefulWidget {
   final ScrollController? scrollController;
   final Widget? background;
   final bool shrinkWrap;
+  final EdgeInsetsGeometry? scrollViewPadding;
   final AppFlowyBoardHeaderBuilder? headerBuilder;
   final AppFlowyBoardFooterBuilder? footerBuilder;
   final ReorderFlexConfig reorderFlexConfig;
@@ -234,8 +241,7 @@ class _AppFlowyBoardContent extends StatefulWidget {
 }
 
 class _AppFlowyBoardContentState extends State<_AppFlowyBoardContent> {
-  late final _scrollController =
-      widget.scrollController ?? ScrollController();
+  late final _scrollController = widget.scrollController ?? ScrollController();
   late AppFlowyBoardState _boardState;
   late BoardPhantomController _phantomController;
   final Map<String, ScrollController> _groupScrollControllers = {};
@@ -311,6 +317,7 @@ class _AppFlowyBoardContentState extends State<_AppFlowyBoardContent> {
           child: SingleChildScrollView(
             scrollDirection: widget.reorderFlexConfig.direction,
             controller: _scrollController,
+            padding: widget.scrollViewPadding,
             child: ReorderFlex(
               config: widget.reorderFlexConfig,
               scrollController: _scrollController,

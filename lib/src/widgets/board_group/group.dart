@@ -378,10 +378,14 @@ class _AppFlowyBoardGroupState extends State<AppFlowyBoardGroup> {
           )
         : ClipRect(child: content);
 
+    final colorOption = widget.dataSource.groupData.colorOption;
+    final bgColor = colorOption != null
+        ? colorOption.backgroundColor(context)
+        : widget.backgroundColor;
     return Container(
       margin: widget.margin,
       decoration: BoxDecoration(
-        color: widget.backgroundColor,
+        color: bgColor,
         borderRadius: BorderRadius.circular(widget.cornerRadius),
       ),
       child: content,
